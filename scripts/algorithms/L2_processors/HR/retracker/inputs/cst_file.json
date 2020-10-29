@@ -1,0 +1,48 @@
+{
+	"__metainf__": {
+        "changelog": [
+            {
+                "comment": "initial version",
+                "parameters": [],
+                "version": 0
+            }
+        ],
+        "description": "L2 GPP Constants File",
+        "version": 0
+    },
+    "semi_minor_axis_cst": {
+        "description": "Semi-minor axis of the ellipsoid",
+        "units": "m",
+        "value": 6356752.3142
+    },
+    "semi_major_axis_cst": {
+        "description": "Semi-major axis of the ellipsoid",
+        "units": "m",
+        "value": 6378137
+    },
+    "flat_coeff_cst": {
+        "description": "Flattening coefficient of the reference ellipsoid",		
+        "units": null,
+        "value": 0.003352810664747
+    },    
+    "earth_radius_cst": {
+        "description": "Earth Radius",
+        "units": "m",
+        "value": 6378137
+    },
+    "sec_in_day_cst": {
+        "description": "Seconds in a day",		
+        "units": "s",
+        "value": 86400
+    },
+    "c_cst": {
+        "description": "Speed of light",		
+        "units": "m/s",
+        "value": 299792458
+    },
+    "pi_cst": {
+        "description": "Pi number",		
+        "units": "radians",
+        "value": 3.141592653589793238462643383
+    }
+}

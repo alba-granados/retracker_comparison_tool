@@ -1,0 +1,109 @@
+{
+	"__metainf__": {
+        "changelog": [
+            {
+                "comment": "initial version",
+                "parameters": [],
+                "version": 0
+            }
+        ],
+        "description": "L2 GPP Characterisation File",
+        "version": 0
+    },
+    "N_total_pulses_b_chd": {
+        "description": "Number of Ku-band pulses per burst",
+        "units": null,
+        "value": 64
+    },
+    "N_samples_chd": {
+        "description": "Number of samples per each SAR pulse",
+        "units": null,
+        "value": 128
+    },    
+    "N_bursts_cycle_chd": {
+        "description": "Number of bursts per radar cycle",
+        "units": null,
+        "value": 4
+    },
+    "pitch_bias_chd": {
+        "description": "Pitch bias",
+		"comment": "Currently is not being used",
+        "units": "radians",
+        "value": 0.0
+    },
+    "roll_bias_chd": {
+        "description": "Roll bias",
+		"comment": "Currently is not being used",
+        "units": "radians",
+        "value": 0.0
+    },
+    "PTR_width_chd": {
+        "description": "Point target response (PTR) width",
+		"comment": "For sigma0 scaling factor computation only when using L1B Sentinel-3 with no such information in L1B product",
+        "units": "s",
+        "value": 2.819e-09
+    },
+    "power_tx_ant_ku_chd": {
+        "description": "Transmitted peak power",
+		"comment": "For sigma0 scaling factor computation only when using L1B Sentinel-3 with no such information in L1B product",
+        "units": "dB",
+        "value": 20
+    },
+    "freq_ku_chd": {
+        "description": "Carrier frequency",
+        "units": "Hz",
+        "value": 1.357500006400000e+10
+    },
+    "prf_chd": {
+        "description": "Pulse repetition frequency",
+        "units": "Hz",
+        "value": 1.782531100000000e+04
+    },
+    "brf_chd": {
+        "description": "burst repetition frequency",
+        "units": "Hz",
+        "value": 78.530690000000007
+    },
+    "bw_rx_ku_chd": {
+        "description": "Receive bandwidth",
+        "units": "Hz",
+        "value": 320e+6
+    },
+    "fs_clock_ku_chd": {
+        "description": "Sampling frequency",
+        "units": "Hz",
+        "value": 320e+6
+    },
+    "antenna_beamwidth_act_ku_chd": {
+        "description": "Antenna beamwidth across-track or range",
+        "units": "radians",
+        "value": 0.023561945318042
+    },
+    "antenna_beamwidth_alt_ku_chd": {
+        "description": "Antenna beamwidth along-track or azimuth",
+        "units": "radians",
+        "value": 0.023561945318042
+    },
+    "antenna_gain_ku_chd": {
+        "description": "Antenna gain",
+        "units": "dB",
+        "value": 41.9000015
+    },
+    "PTR_Hamming": {
+        "description": "Sigma PTR with Hamming window",
+		"comment": "Sigma of Gaussian fitting to PTR with Hamming window, minimizing the RMSE",
+        "units": null,
+        "value": 0.54351
+    },
+    "PTR_Hanning": {
+        "description": "Sigma PTR with Hamming window",
+		"comment": "Sigma of Gaussian fitting to PTR with Hanning window, minimizing the RMSE",
+        "units": null,
+        "value": 0.59824
+    },
+    "PTR_Boxcar": {
+        "description": "Sigma PTR with Boxcar window",
+        "units": null,
+        "value": 0.36012
+    }
+}

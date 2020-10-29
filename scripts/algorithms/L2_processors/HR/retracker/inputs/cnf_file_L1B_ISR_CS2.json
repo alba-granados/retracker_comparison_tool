@@ -1,0 +1,477 @@
+{
+    "__metainf__": {
+        "changelog": [
+            {
+                "comment": "initial version",
+                "parameters": [],
+                "version": 0
+            }            
+        ],
+        "description": "L2 GPP Configuration File",
+        "version": 0
+    },
+	"mission": {
+        "description": "Mission name (flag values: CS2,S3,S6)",
+        "units": "flag",
+        "value": "CS2"
+    },
+    "mode": {
+        "description": "SAR mode (flag values: SAR, SARin, RAW, RMC,LR-RMC,FF-RAW,FF-RMC)",
+        "units": "flag",
+        "value": "SAR"
+    },
+    "L1proc": {
+        "description": "L1B or delay-doppler processor being used (flag values: ESA, ISD, GPOD, DeDop)",
+        "units": "flag",
+        "value": "ISD"
+    },
+    "use_zeros_cnf": {
+        "description": "Flag indicating whether to use or not the zeros in the multi-looking processing",
+        "units": "flag",
+        "value": true
+    },
+    "ZP": {
+        "description": "Zero-padding value",
+        "units": null,
+        "value": 2
+    },
+	"antenna_compensation_along": {
+		"description": "Flag to indicate that the antenna pattern weighting along-track (Doppler) has been compensated in L1B processing",
+        "units": "flag",
+        "value": false
+	},
+    "window_type_a": {
+        "description": "Along-track or azimuth window type (flag values: Hamming, Hanning, Boxcar, Forced or Adaptive)",
+        "comment": "In the Adaptive case the PTR is updated according to SWH and based on empirical expression found by Dinardo",
+		"units": "flag",
+        "value": "Forced"
+    },
+    "window_type_r": {
+        "description": "Across-track or range window type (flag values: Hamming, Hanning, Boxcar, Forced or Adaptive)",
+		"comment": "In the Adaptive case the PTR is updated according to SWH and based on empirical expression found by Dinardo",
+        "units": "flag",
+        "value": "Forced"
+    },
+	"PTR_forced_al": {
+        "description": "Forced sigma along-track PTR",
+        "units": null,
+        "value": 0.65
+    },
+    "PTR_forced_ac": {
+        "description": "Forced sigma across-track PTR",
+        "units": null,
+        "value": 0.54351
+    },
+	"seed_info": {
+        "description": "Flag to seed information: 0: no seed introduced; 1: seed provided by the phase info from SARin data",
+		"comment":"Old variable (to be removed in future)",
+        "units": "flag",
+        "value": false
+    },
+	"IFmask_N": {
+        "description": "First/last N samples of the waveform affected by the IF mask filter, which should be excluded from processing Specify if known, 0 if not known ",
+		"comment":"Old variable (to be removed in future)",
+        "units": "count",
+        "value": 0
+    },
+	"retracker_name": {
+        "description": "A string vector indicating the different retrackers to be used: options 'THRESHOLD','OCOG','ANALYTICAL' ",
+        "units": "flag",
+        "value": ["ANALYTICAL"]
+    },
+    "analytical_type_of_fitting": {
+        "description": "Type of fitting when using analytical retracker: options: SWH, MSS or 2step",
+        "units": "flag",
+        "value": ["SWH"]
+    },
+    "ref_sample_wd": {
+        "description": "Reference sample (zero-padded) for the window delay",
+        "units": "count",
+        "value": 64
+    },
+    "mask_ROI_flag": {
+        "description": "Flag that activates filtering out those surfaces outside the kml mask",
+        "units": "flag",
+        "value": false
+    },
+	"filter_land": {
+        "description": "Flag that activates filtering out those surfaces considered as land (two options are available)",
+        "units": "flag",
+        "value": false
+    },
+	"filter_land_type": {
+        "description": "String that indicates the approach to filter land surfaces: 'land_sea_mask' For Sentinel-3 and CryoSat-2 surf_type_flag: 0,1,2,3: open_ocean or semi-enclosed_seas, enclosed_seas or lakes, continental_ice, land; 'dist_to_coast' using the distance to coast global maps Distance to Nearest Coastline: 0.01-Degree Grid: Ocean",
+        "units": "flag",
+        "value": "land_sea_mask"
+    },
+    "mask_looks_flag": {
+        "description": "Flag that activates filtering those surfaces without a minimum number of beams in the stack",
+        "units": "flag",
+        "value": false
+    },
+    "Neff_thres": {
+        "description": "Number of minimum number of beams per stack that a surface shall have in order not to be discarded from fitting (meant to be useful for the beginning and end of track)",
+        "units": "count",
+        "value": 469
+    },
+	"wvfm_discard_samples": {
+        "description": "Flag to discard some samples at begining and/or end of waveform",
+        "units": "flag",
+        "value": false
+    },
+	"wvfm_discard_samples_begin": {
+        "description": "Number of zero-padded samples at the beginning of waveform to be discarded",
+        "units": "count",
+        "value": 12
+    },
+	"wvfm_discard_samples_end": {
+        "description": "Number of zero-padded samples at the end of waveform to be discarded",
+        "units": "count",
+        "value": 14
+    },
+    "wvfm_portion_selec": {
+        "description": "Flag to activate the portion selection of the waveform where to consider the fitting",
+        "units": "flag",
+        "value": false
+    },
+    "wvfm_portion_selec_type": {
+        "description": "Type of waveform portion selection to be considered: 'CP4O': using a reference height from geoid or smothed WD; 'ref_height': using a reference height from DEM (related to some peak + window around it); 'peak_win' using the maximum peak of waveform with a window around it (wvfm_portion_selec_l_samples, wvfm_portion_selec_r_samples); 'peak_valey' using the maximum peak selecting the samples around it based on two closest valleys srounding the peak plus a margin defined by the wvfm_portion_selec_l_samples and wvfm_portion_selec_r_samples",
+        "units": "flag",
+        "value": "ref_height"
+    },
+    "wvfm_portion_selec_DEM_ref": {
+        "description": "Type of DEM used in waveform portion selection for 'ref_height' case",
+        "units": "flag",
+        "value": "SRTM"
+    },
+    "wvfm_portion_selec_DEM_path": {
+        "description": "Path to the DEM to be used or saved in case SRTM DEM is used",
+        "units": "flag",
+        "value": "C:/Users/eduard.makhoul/isardSAT/projects/SHAPE/data/input/DEM_SRTM/"
+    },
+    "wvfm_portion_selec_l_samples": {
+        "description": "left samples w.r.t to position of ref. position within window (either peak or valley)",
+        "units": null,
+        "value": 20
+    },
+    "wvfm_portion_selec_r_samples": {
+        "description": "right samples w.r.t to position of ref. position within window (either peak or valley)",
+        "units": null,
+        "value": 10
+    },
+	"peak_prominence_norm": {
+		"comment": "Currently used only with ref_height option",
+        "description": "Define the minimum prominence of the peaks to be sorted out in a multipeak scenario",
+        "units": null,
+        "value": 0.4
+    },
+    "th_retracker_percentage_peak": {
+        "description": "Percentatge of the peak for threshold retracker",
+        "units": null,
+        "value": 50
+    },
+    "OCOG_retracker_percentage_pow_OCOG": {
+        "description": "Percentatge of OCOG power",
+        "units": null,
+        "value": 87
+    },
+    "OCOG_retracker_n1": {
+        "description": "First zero-padded sample to be used in leading edge estimation",
+        "units": null,
+        "value": 35
+    },
+    "OCOG_retracker_n2": {
+        "description": "Last zero-padded sample to be used in leading edge estimation",
+        "units": null,
+        "value": 128
+    },
+    "OCOG_retracker_offset": {
+        "description": "Offset from epoch estimation",
+        "units": null,
+        "value": 0
+    },
+    "OCOG_retracker_param_comp_method": {
+        "description": "Flag indicating which type of method used to extract OCOG parameters: 0: square of power samples (Frappart) or 1: using the power samples (Wingham)",
+        "units": "flag",
+        "value": "0"
+    },
+	"OCOG_retracker_implementation_method": {
+        "description": "Flag indicating which OCOG approach followed: 0: Using threshold-based approach computed within n1 and n2; 1: Computing Amplitude reference within limits defined by the window centered at the COG; 2 : Using epoch=offset+(COG-W/2)",
+        "units": "flag",
+        "value": "0"
+    },
+	"analytical_retracker_Thn_flag": {
+		"description": "Flag to account for ThN estimation",		
+        "units": "flag",
+        "value": true
+    },
+	"analytical_retracker_Thn_estimation_method": {
+		"description": "Flag to indicate the type of noise estimation method being used ('external': using an external-input cnf value; 'fixed_window': using a set of range bins in a given window to estimat the noise in analytical_retracker_Thn_w_first and analytical_retracker_Thn_w_width; 'adaptive': use an adaptive window computed based on the derivative of the waveform and a given threshold analytical_retracker_Thn_threshold_noise, which is accordingly increased with a given maximum number of iterations max_iter_noise)",		
+        "units": "flag",
+        "value": "external"
+    },
+	"analytical_retracker_external_Thn_value": {
+		"description": "External value of the noise level",		
+        "units": "W",
+        "value": 0.00245
+    },
+	"analytical_retracker_Thn_w_first": {
+		"description": "Gate number to start Thermal noise windowing; this is a subscript indice thus must be > 0 ",		
+        "units": "count",
+        "value": 1
+    },
+	"analytical_retracker_Thn_w_width": {
+		"description": "Thermal noise window width in range bins ",		
+        "units": "count",
+        "value": 20
+    },
+	"analytical_retracker_threshold_noise": {
+		"description": "threshold used to estimate the samples used in the noise window estimation based on the derivative of the window",		
+        "units": "W",
+        "value": 1e-03
+    },
+	"analytical_retracker_factor_increase_noise_iter": {
+		"description": "factor to multiply the threshold of noise per iteration",		
+        "units": "count",
+        "value": 1.5
+    },
+	"analytical_retracker_max_iter_noise": {
+		"description": "Maximum number of iterations for adaptive noise estimation",		
+        "units": "count",
+        "value": 100
+    },
+	"analytical_retracker_Thn_ML_SL_method": {
+		"description": "Flag indicating how the thermal noise is being estimated: 'SL': using the noise per look from the real stack (requires to pass thee whole stack); 'ML': using the input L1B multi-looked waveform",		
+		"comment": "Current approach to be used is the ML waveform as stack is unlikely to be provided for all tracks processing",
+        "units": "flag",
+        "value": "ML"
+    },	
+	"analytical_retracker_rou": {
+		"comment": "For open ocean typical value is 1e-02 for waters 1e-04 (to be tested)",
+        "description": "Mean squared slopes (MSS) when fitting the SWH, models the surface radiation pattern alpha_sigma=1/(H_orb^2*MSS): a value of -1 indicates that no specific radiation pattern is considered in the model alpha_sigma=0",		
+        "units": null,
+        "value": -1
+    },
+	"analytical_retracker_Hs": {
+        "description": "Value of the SWH when fitting the MSS",
+        "units": "m",
+        "value": 1e-06
+    },
+	"analytical_retracker_range_index_method": {
+		"description": "Flag indicating the method to compute the range indexation: 'conventional': creating the range vector used in fitting use directly 1:1:N_samples*zp; 'resampling': resampling/re-interpolating the original defintion of range indexation with no zero padding nor extra on-board resampling",
+        "units": "flag",
+        "value": "resampling"
+    },
+	"analytical_retracker_looks_index_method": {
+		"description": "Flag indicating the method to compute the look indexation: 'Cris_old': using -N_looks/2:N_looks/2 (not to be used just as tests); 'Norm_index': Normalizing by the number of pulses (not to be used, just as tests); 'Doppler_freq': Exploiting the Doppler frequency based on beam angle information; 'Look_angle': Exploiting the look angles used to generate the stack",
+        "units": "flag",
+        "value": "Look_angle"
+    },
+	"analytical_retracker_look_ang_method": {
+		"description": "Flag indicating the look angle method to compute the look indexation: 'approximate': exploiting the min (start) and max (stop) look angles (linear trend along the stack: correct assumption for non-highly variable surfaces as ocean); 'exact': using the look angle per beam available from the stack information",
+        "units": "flag",
+        "value": "approximate"
+    },
+	"analytical_retracker_fd_method": {
+		"description": "Flag indicating the Doppler method to compute the look indexation: 'approximate': exploiting the min (start) and max (stop) beam angles (linear trend along the stack: correct assumption for non-highly variable surfaces as ocean); 'exact': using the beam angle per beam available from the stack information",
+        "units": "flag",
+        "value": "approximate"
+    },
+	"analytical_retracker_multilook_option": {
+		"description": "Flag indicating the multilooking option: 'Cris_old': thermal noise is added to each SL modelled waveform; 'NormML_plus_noise': ML wvfm is normalized and the thermal noise is added outside",
+        "units": "flag",
+        "value": "Cris_old"
+    },	
+	"analytical_retracker_Doppler_mask_cons_option": {
+		"description": "Flag indicating the way to construct the Doppler mask to be applied to the modelled stack: 'external': using the information provided in the L1B product; 'internal': computed internally",
+        "units": "flag",
+        "value": "external"
+    },	
+	"analytical_retracker_Doppler_mask_cons_internal": {
+		"description": "Flag indicating the way to construct the internal Doppler mask to be applied to the modelled stack: 'l1b_like': constructing based on the geometry/slant range correction (modeling the slant range correction in Doppler domain); 'epoch_like': based on slant range correction modeling in Doppler domain, using the epoch as the minimum point of closest approach and the range history is then computed on top of it (to be implemented)",
+        "units": "flag",
+        "value": "l1b_like"
+    },
+	"analytical_retracker_power_wfm_model": {
+        "description": "Define the model approximation of power wfm whether to compute: 'simple': Pkl=Bkl*sqrt(gl)*func_f0; 'complete': Pkl=Bkl*sqrt(gl)*(func_f0+Tkl*gl*simga_s^2*func_f1)",
+        "units": "flag",
+        "value": "complete"
+    },
+	"analytical_retracker_lut_flag": {
+        "description": "Flag to activate the usage of look up tables (LUTs)",
+        "units": "flag",
+        "value": true
+    },
+	"analytical_retracker_LUT_ximax": {
+        "description": "Maximum value of the LUT argument saved in the file",
+        "units": null,
+        "value": 50
+    },
+	"analytical_retracker_LUT_ximin": {
+        "description": "Minimum value of the LUT argument saved in the file",
+        "units": null,
+        "value": -10
+    },
+	"analytical_retracker_LUT_step": {
+        "description": "Step of the argument of the LUT",
+        "units": null,
+        "value": 1e-05
+    },
+	"analytical_retracker_pre_processing": {
+        "description": "flag to activate the pre-processing stage to generate an initial seed estimation of epoch based on a threshold retracker",
+        "units": "flag",
+        "value": true
+    },
+	"analytical_retracker_pre_processing_percent_leading_edge": {
+        "description": "Percentage of peak detect to establish the mid-point leading edge",
+        "units": null,
+        "value": 87
+    },
+	"analytical_retracker_ini_Epoch": {
+        "description": "Initial seed for epoch (zero-padded sample)",
+        "units": null,
+        "value": 35
+    },
+	"analytical_retracker_ini_Hs": {
+        "description": "Initial seed for the SWH fitting",
+        "units": "m",
+        "value": 2.0
+    },
+	"analytical_retracker_ini_Pu": {
+        "description": "Initial seed for the amplitude fitting Pu",
+        "units": null,
+        "value": 1
+    },
+	"analytical_retracker_ini_MSS": {
+        "description": "Initial seed for MSS fitting",
+        "units": null,
+        "value": 1e-02
+    },
+	"fitting_fun_type": {
+        "description": "Flag indicating the type of fitting routine to be used: 'flag': Using the lsqcurvfit function; 'fmin': using the fmin search algorithm",
+        "units": "flag",
+        "value": "lsq"
+    },
+	"lsq_algorithm": {
+        "description": "Flag indicating the type of specific minimization algorithm: 'levenberg-marquardt' or 'trust-region-reflective'",
+        "units": "flag",
+        "value": "trust-region-reflective"
+    },
+	"fitting_options_lb": {
+        "description": "Lower bounds in the fitting for the fitted parameters",
+        "units": null,
+        "value": [0,0,0]
+    },
+	"fitting_options_ub": {
+        "description": "Upper bounds in the fitting for the fitted parameters",
+        "units": null,
+        "value": null
+    },
+	"analytical_retracker_two_step_fitting_COR_threshold_rou": {
+        "description": "Threshold below which the second fitting on MSS is used (in the 2-step fitting)",
+        "units": null,
+        "value": 95
+    },
+	"analytical_retracker_initial_param_fit_feedback_flag": {
+        "description": "Flag to activate the updating of the initial parameters per fitted waveform either using the sliding window or with acumulation of previous info",
+        "units": "flag",
+        "value": false
+    },	
+	"analytical_retracker_ini_Hs_rou_sliding_win_opt": {
+        "description": "Flag to activate the updating of the initial parameters using the sliding window",
+        "units": "flag",
+        "value": true
+    },
+	"analytical_retracker_ini_Hs_rou_sliding_win_opt_discard_std_thr": {
+        "description": "number of times std for removal (it is also used for comparison with the accumulated one)",
+        "units": "count",
+        "value": 3
+    },
+	"analytical_retracker_ini_Hs_rou_sliding_win_size": {
+        "description": "Size of the sliding window (number of surfaces) used in the statistical characterization of the Hs/roughness seed",
+        "units": "count",
+        "value": 10
+    },	
+	"quality_flag_misfit_th": {
+        "description": "Threshold on misfit, between measured waveform and modelled one, above which a bad retrieval is considered",
+		"comment": "Current version considers it only for Sea State CCI project",
+		"units": "flag",
+        "value": 5.0
+    },
+	"geo_corr_application_flag": {
+        "description": "Flag to activate the application of the geophysical corrections",
+        "units": "flag",
+        "value": true
+    },
+	"force_geocorr_surf_type": {
+        "description": "Flag true: use the same group of geophysical corrections to all the records independently of the flag of the surface type (forcing the type of surface indicated in product_type_surface); false: use the geophysical corrections depending on the flag surface type included in the L1B",
+        "units": "flag",
+        "value": true
+    },
+	"product_type_surface": {
+        "description": "Type of surface to use the geophysical corrections forced to all surfaces within track ('open_ocean','sea_ice','land_ice','land')",
+        "units": "flag",
+        "value": "open_ocean"
+    },
+	"atm_att_correction_flag": {
+        "description": "Flag to activate the atmospheric attenuation correction on sigma0",
+        "units": "flag",
+        "value": true
+    },
+	"Product_type": {
+        "description": "String to indicate whether land (LAN) or water product (WAT), to be consistent with Sentinel-3 products",
+        "units": "flag",
+        "value": "WAT"
+    },
+	"write_output": {
+        "description": "Flag to write the output product (true: write product; false: omit saving L2 product)",
+        "units": "flag",
+        "value": true
+    },
+	"output_product_format": {
+        "description": "Flag to indicate the type of output product to be generated (nc: netcdf or mat: matlab file)",
+        "units": "flag",
+        "value": "nc"
+    },
+	"nc_format_type": {
+        "description": "String indicating the format of the netcdf output product: default (all other projects), SS_CCI (sea state CCI project)",
+        "units": "flag",
+        "value": "default"
+    },
+	"nc_name_surface_height": {
+        "description": "string indicating the name of nc variable of output product for surface height: ssh (sea surface height) or sh (surface height); not applicable to SS_CCI project format",
+        "units": "flag",
+        "value": "ssh"
+    },
+	"optional_ext_file_flag": {
+        "description": "Flag indicating whether to include or not a given extension to the output product name of file",
+        "units": "flag",
+        "value": false
+    },
+	"file_ext_string": {
+        "description": "string for the extension to the output product name of file",
+        "units": "flag",
+        "value": "prova"
+    },
+	"plot_fits_flag": {
+        "description": "Flag to generate fitting plots of waveforms",
+        "units": "flag",
+        "value": true
+    },
+	"plot_fits_lat_range": {
+        "description": "Range of min and max latitudes of surfaces, whose fitting is ploted",
+        "units": "Degrees North",
+        "value": [-91,91]
+    },
+	"plot_fits_downsampling": {
+        "description": "Downsampling of the surfaces to be ploted: every each number of surfaces the plot is generated and saved",
+        "units": "count",
+        "value": 50
+    },
+	"visible_figures": {
+        "description": "Flag to indicate whether the generated plots shall be prompted or displayed",
+        "units": "flag",
+        "value": false
+    }
+	
+}
