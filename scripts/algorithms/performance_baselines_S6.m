@@ -347,7 +347,7 @@ if generate_plot_SSH
         
         bias_compensation=0.0;%nanmean(SSH(b,:))-12.0;
                 
-        plot(lat_surf{b},SSH{b1}-SSH{b2},'Marker',char(marker_bs(b)),'Color',color_bs(b,:),'LineStyle',LineStyle, 'MarkerSize', cnf_tool.default_markersize);
+        plot(lat_surf{b1},SSH{b1}-SSH{b2},'Marker',char(marker_bs(b)),'Color',color_bs(b,:),'LineStyle',LineStyle, 'MarkerSize', cnf_tool.default_markersize);
         hold on;
         legend_text=[legend_text,strcat(sprintf('%s vs %s', char(name_bs(b1)), char(name_bs(b2))))];
         text_in_textbox=[text_in_textbox, sprintf('%s vs %s:', char(name_bs(b1)), char(name_bs(b2))), sprintf('mean = %.4g [m]\nstd = %.4g [m]', ...
@@ -439,7 +439,7 @@ if generate_plot_SWH
         
         bias_compensation=0.0;%nanmean(SSH(b,:))-12.0;
                 
-        plot(lat_surf{b},SWH{b1}-SWH{b2},'Marker',char(marker_bs(b)),'Color',color_bs(b,:),'LineStyle',LineStyle, 'MarkerSize', cnf_tool.default_markersize);
+        plot(lat_surf{b1},SWH{b1}-SWH{b2},'Marker',char(marker_bs(b)),'Color',color_bs(b,:),'LineStyle',LineStyle, 'MarkerSize', cnf_tool.default_markersize);
         hold on;
         legend_text=[legend_text,sprintf('%s vs %s', char(name_bs(b1)), char(name_bs(b2)))];
         text_in_textbox=[text_in_textbox, sprintf('%s vs %s:', char(name_bs(b1)), char(name_bs(b2))), sprintf('mean = %.4g [m]\nstd = %.4g [m]', ...
@@ -487,8 +487,8 @@ if generate_plot_sigma0
         plot(lat_surf{b},sigma0{b}-bias_compensation,'Marker',char(marker_bs(b)),'Color',color_bs(b,:),'LineStyle',LineStyle, 'MarkerSize', cnf_tool.default_markersize);
         hold on;
         legend_text=[legend_text,name_bs(b)];
-        text_in_textbox=[text_in_textbox, strcat(char(name_bs(b)), ':'), sprintf('RMSE = %.4g [dB]\nstd = %.4g [dB]\nBias = %.4g [dB]',...
-            sigma0_RMSE(b), sigma0_std_mean(b), nanmean(sigma0_mean{b}-bias_compensation)-ref_sigma0)];
+        text_in_textbox=[text_in_textbox, strcat(char(name_bs(b)), ':'), sprintf('RMSE = %.4g [dB]\nstd = %.4g [dB]\nMean = %.4g [dB]',...
+            sigma0_RMSE(b), sigma0_std_mean(b), nanmean(sigma0_mean{b}))];
 %         text_in_textbox=[text_in_textbox, strcat(char(name_bs(b)), ':'), sprintf('RMSE = %.4g [dB]\nstd = %.4g [dB]\nmean = %.4g [dB]',...
 %             sigma0_RMSE(b), sigma0_std_mean(b), nanmean(sigma0_mean{b}))];
         if b ~= N_baselines
@@ -537,7 +537,7 @@ if generate_plot_sigma0
         
         bias_compensation=0.0;%nanmean(SSH(b,:))-12.0;
                 
-        plot(lat_surf{b},SWH{b1}-SWH{b2},'Marker',char(marker_bs(b)),'Color',color_bs(b,:),'LineStyle',LineStyle, 'MarkerSize', cnf_tool.default_markersize);
+        plot(lat_surf{b1},sigma0{b1}-sigma0{b2},'Marker',char(marker_bs(b)),'Color',color_bs(b,:),'LineStyle',LineStyle, 'MarkerSize', cnf_tool.default_markersize);
         hold on;
         legend_text=[legend_text,sprintf('%s vs %s', char(name_bs(b1)), char(name_bs(b2)))];
         text_in_textbox=[text_in_textbox, sprintf('%s vs %s:', char(name_bs(b1)), char(name_bs(b2))), sprintf('Mean = %.4g [dB]\nstd = %.4g [dB]', ...
@@ -635,7 +635,7 @@ if generate_plot_COR && ~any(ismember(cnf_tool.L2proc,'GPP'))
         
         bias_compensation=0.0;%nanmean(SSH(b,:))-12.0;
                 
-        plot(lat_surf{b},COR{b1}-COR{b2},'Marker',char(marker_bs(b)),'Color',color_bs(b,:),'LineStyle',LineStyle, 'MarkerSize', cnf_tool.default_markersize);
+        plot(lat_surf{b1},COR{b1}-COR{b2},'Marker',char(marker_bs(b)),'Color',color_bs(b,:),'LineStyle',LineStyle, 'MarkerSize', cnf_tool.default_markersize);
         hold on;
         legend_text=[legend_text,sprintf('%s vs %s', char(name_bs(b1)), char(name_bs(b2)))];
         text_in_textbox=[text_in_textbox, sprintf('%s vs %s:', char(name_bs(b1)), char(name_bs(b2))), strcat(sprintf('Mean = %.4g', ...

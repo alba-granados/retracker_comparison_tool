@@ -1107,7 +1107,7 @@ end
             if cnf_p.plot_fits_flag && ((mod(m,cnf_p.plot_fits_downsampling)==0) || (m==1)) && (data.GEO.LAT(m)>=cnf_p.plot_fits_lat_range(1) && data.GEO.LAT(m)<=cnf_p.plot_fits_lat_range(2))
 
                 text_interpreter=get(0, 'defaultAxesTickLabelInterpreter'); %cnf_p.text_interpreter;
-                colors=[[0/255, 114/255, 178/255]; [230/255, 159/255, 0]; [0, 158/255, 115/255]; [213/255, 94/255, 0]]; % colorblind palette for plots
+                colors=[86/255, 180/255, 233/255; 230/255, 159/255, 0/255; 0/255, 158/255, 115/255; 213/255, 94/255, 0/255; 0/255, 114/255, 178/255; 204/255, 121/255, 167/255; 240/255, 228/255, 66/255; 0/255, 0/255, 0/255]; % colorblind palette for plots
 
                 f1=figure;
                 plt=plot(1:data.N_samples,data.HRM.power_wav_filtered(m,:)/max(data.HRM.power_wav_filtered(m,:)),'Color', colors(1,:), 'LineStyle', '-');
