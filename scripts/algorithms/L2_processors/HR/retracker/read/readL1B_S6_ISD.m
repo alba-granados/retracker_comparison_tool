@@ -81,7 +81,12 @@ switch ext
         num_surfaces = length(ncread(filename_L1B,'data_20/ku/time_tai'));
 
 %         dimid=netcdf.inqDimID(ncid,'ns');
-        dimid=netcdf.inqDimID(ncid,'samples');
+        [~,filename_L1B_nopath,~]=fileparts(filename_L1B);
+        if any(strcmp(split(filename_L1B_nopath,'_'), 'no')) 
+            dimid=netcdf.inqDimID(ncid,'samples');
+        else % range_walk processing and ocog
+            dimid=netcdf.inqDimID(ncid,'samples_ov'); 
+        end
         [~,N_samples]=netcdf.inqDim(ncid,dimid);
         
 		switch cnf_p.mode
