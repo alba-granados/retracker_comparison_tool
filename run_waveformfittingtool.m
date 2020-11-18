@@ -67,8 +67,16 @@ end
 
 % Default path to configuration file
 cnf_waveformfittingtool_path  = strcat(pwd, filesep);    
+tool_bsln_id = 'range_walk_ocog.json';
+inputFiles      =   dir(cnf_waveformfittingtool_path);
+aux=struct2cell(inputFiles); aux=aux(1,:); %Keep the
+if ~isempty(tool_bsln_id)
+    cnf_waveformfittingtool_filename=[cnf_waveformfittingtool_path inputFiles(~cellfun(@isempty,strfind(aux,char(['cnf_waveformfittingtool','_',tool_bsln_id])))).name];
+else
+    cnf_waveformfittingtool_filename=[cnf_waveformfittingtool_path inputFiles(~cellfun(@isempty,strfind(aux,char('cnf_waveformfittingtool')))).name];
+end
 fprintf('Path to waveform fitting tool configuration file:\n%s\n', cnf_waveformfittingtool_path);
-cnf_waveformfittingtool_filename  = strcat(cnf_waveformfittingtool_path, 'cnf_waveformfittingtool_hydrocoastal.json');    
+% cnf_waveformfittingtool_filename  = strcat(cnf_waveformfittingtool_path, 'cnf_waveformfittingtool.json');    
 
 [cnf_tool]=read_CNF_tooloptions(cnf_waveformfittingtool_filename);
 
@@ -96,6 +104,7 @@ textbox_fontsize =cnf_tool.textbox_fontsize;
 legend_fontsize =cnf_tool.legend_fontsize;
 default_fontsize =cnf_tool.default_fontsize;
 overlay_baselines =cnf_tool.overlay_baselines; 
+num_pools = cnf_tool.num_pools; 
 
 % retrieved parameters performance analysis
 LineStyle=cnf_tool.LineStyle;
@@ -122,7 +131,7 @@ set(groot,'defaultLegendFontSize', cnf_tool.legend_fontsize);
 set(groot, 'defaultAxesTickLabelInterpreter',cnf_tool.text_interpreter); set(groot, 'defaultLegendInterpreter',cnf_tool.text_interpreter);
 set(0,'defaultFigurePaperPosition', mida);
 set(0,'defaultLineLineWidth',cnf_tool.default_linewidth);   % set the default line width
-set(0,'DefaultFigureVisible','off')
+set(0,'DefaultFigureVisible',cnf_tool.visible_figures);
  
 % for L2 HR processor, please check /retracker/plotting/set_default_plot.m
 % ( or comment call in /retracker/algorithms/L2_processing.m )
@@ -212,7 +221,7 @@ filename_mask_KML='';
 
 
 %% run L2 processors and define L2 product input path for model fit tool
-   
+
 for i_baseline=1:num_baselines 
     if strcmp(name_bs(i_baseline), 'LRM') && cnf_tool.run_L2(i_baseline)
         
@@ -237,7 +246,7 @@ for i_baseline=1:num_baselines
         end
 
         L2_bulk_processing_paralelization(char(input_path_L1_ISR_bs(i_baseline)),char(output_path_L2_ISR_bs(i_baseline)),cnf_chd_cst_path, ...
-            'proc_bsln_id',proc_bsln_id);
+            'proc_bsln_id',proc_bsln_id, 'num_pools',num_pools);
         
         % redefine L2 product input path for model fit tool is output/data/ of L2 processors
         input_path_L2_ISR_bs(i_baseline) = cellstr(strcat(output_path_L2_ISR_bs(i_baseline), 'data', filesep));   
@@ -258,7 +267,11 @@ for i_baseline=1:num_baselines
     filesBulk(i_baseline).cnf_chd_cst_path        =   cnf_chd_cst_path;
     inputFiles      =   dir(filesBulk(i_baseline).cnf_chd_cst_path);
     aux=struct2cell(inputFiles); aux=aux(1,:);
-    filesBulk(i_baseline).CNF_file=[filesBulk(i_baseline).cnf_chd_cst_path inputFiles(~cellfun(@isempty,strfind(aux,char(['cnf_file'])))).name];
+    if ~isempty(proc_bsln_id)
+        filesBulk(i_baseline).CNF_file=[filesBulk(i_baseline).cnf_chd_cst_path inputFiles(~cellfun(@isempty,strfind(aux,char(['cnf_file','_',proc_bsln_id])))).name];
+    else
+        filesBulk(i_baseline).CNF_file=[filesBulk(i_baseline).cnf_chd_cst_path inputFiles(~cellfun(@isempty,strfind(aux,char(['cnf_file'])))).name];
+    end
     filesBulk(i_baseline).CST_file=[filesBulk(i_baseline).cnf_chd_cst_path inputFiles(~cellfun(@isempty,strfind(aux,char(['cst_file','.json'])))).name];
 
     reduced_set_cnf.SCOOP=0;
@@ -284,7 +297,13 @@ for i_baseline=1:num_baselines
     inputFiles      =   dir(filesBulk(i_baseline).input_path_L1_ISR_bs);
     aux=struct2cell(inputFiles); aux=aux(1,:); 
     aux_filter=aux(~strcmp(aux,['.'])&~strcmp(aux,['..']));
-    [~,~,filter]=fileparts(aux_filter{1});
+    accepted_filters = {'.NC', '.nc'};
+    for ii=1:numel(aux_filter)
+        [~,~,filter]=fileparts(aux_filter{ii});
+        if any(find(ismember(accepted_filters,filter)))
+            break;
+        end
+    end
 
 %     filter='.NC';  
     filterDATAFILES=(~cellfun(@isempty,strfind(aux,filter)));
@@ -299,7 +318,13 @@ for i_baseline=1:num_baselines
     inputFiles      =   dir(filesBulk(i_baseline).input_path_L2_ISR_bs);
     aux=struct2cell(inputFiles); aux=aux(1,:);
     aux_filter=aux(~strcmp(aux,['.'])&~strcmp(aux,['..']));
-    [~,~,filter]=fileparts(aux_filter{1});
+    accepted_filters = {'.NC', '.nc'};
+    for ii=1:numel(aux_filter)
+        [~,~,filter]=fileparts(aux_filter{ii});
+        if any(find(ismember(accepted_filters,filter)))
+            break;
+        end
+    end
     
 %     filter2DATAFILES=(~cellfun(@isempty,strfind(lower(aux),filter)));
     filter2DATAFILES=(~cellfun(@isempty,strfind(aux,filter)));
