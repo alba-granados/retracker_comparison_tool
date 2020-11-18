@@ -199,7 +199,6 @@ fprintf('Total # wvfms %d\n',L2_num_surfaces);
 for m = 1:L2_num_surfaces
 
 	if ((mod(m,cnf_tool.plot_downsampling)==0) || (m==1)) 
-	    disp(strcat('Plot surface #',num2str(m)));
 
         text_interpreter=get(0, 'defaultAxesTickLabelInterpreter'); %cnf_p.text_interpreter;
         
@@ -212,6 +211,7 @@ for m = 1:L2_num_surfaces
                 continue;
             end
 
+            fprintf('Plot surface #%s of baseline %d\n',num2str(m), i_baseline);
             if ~cnf_tool.overlay_baselines
                 if i_baseline==1 
                     close(f1); 
@@ -446,7 +446,8 @@ for m = 1:L2_num_surfaces
                     title(sprintf('wav. # %d (LAT: %.4g deg)', m, data{i_baseline}.GEO.LAT(m)), 'Interpreter', text_interpreter); 
                 end
                 axis([1 data{i_baseline}.N_samples 0 1.0]);
-                annotation('textbox', [pos_leg(1),pos_leg(2)-1.5*pos_leg(4),pos_leg(3),pos_leg(4)],...
+                textbox_string=textbox_string(~cellfun(@isempty,textbox_string));
+                annotation('textbox', [pos_leg(1),pos_leg(2)-1.3*pos_leg(4),pos_leg(3),pos_leg(4)],...
                     'String',textbox_string,...
                     'FitBoxToText','on',  'interpreter',text_interpreter,  'Fontsize', cnf_tool.textbox_fontsize);
                 
@@ -476,7 +477,8 @@ for m = 1:L2_num_surfaces
             legend_text=[legend_text, 'Fitting range limit'];
             h_leg=legend(legend_text(~cellfun(@isempty,legend_text)),'Location','northeastoutside','Fontsize',cnf_tool.legend_fontsize);
             pos_leg=get(h_leg,'Position');
-            annotation('textbox', [pos_leg(1),pos_leg(2)-1.5*pos_leg(4),pos_leg(3),pos_leg(4)],...
+            textbox_string=textbox_string(~cellfun(@isempty,textbox_string));
+            annotation('textbox', [pos_leg(1),pos_leg(2)-1.3*pos_leg(4),pos_leg(3),pos_leg(4)],...
                 'String',textbox_string,...
                 'FitBoxToText','on',  'interpreter',text_interpreter, 'Fontsize', cnf_tool.textbox_fontsize);
             grid on
@@ -505,8 +507,8 @@ for m = 1:L2_num_surfaces
             if cnf_tool.save_figure_format_fig
                savefig([filesBulk(i_baseline).resultPath,file_id,'_',ext_baselines_comp, '_W',num2str(m,'%04.0f'), '.fig']) 
             end
-            close(f1);
-	    end
+        end
+        close(f1);
 
 	end
 end
