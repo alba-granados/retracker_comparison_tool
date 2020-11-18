@@ -1,0 +1,171 @@
+{
+	"__metainf__": {
+        "changelog": [
+            {
+                "comment": "initial version",
+                "parameters": [],
+                "version": 0
+            }
+        ],
+        "description": "Configuration file of the waveform fitting tool of Sentinel-6 P4 L1 GPP - CCN 3",
+        "version": 0
+    },
+    	"mission": {
+        "description": "Mission name (flag value: S6)",
+        "value": "S6"
+    },
+    	"name_bs": {
+        "description": "Baselines names for analysis",
+        "value": ["normal","OCOG","RangeWalk"]
+    },
+	"run_L2": {
+        "description": "Run L2 processor for each of the baselines to be analyzed. If 0, input_path_L2_ISR_bs corresponding flag must be specified. Set LRM to 1",
+        "value": [1,0,0]
+    },
+    	"L2proc": {
+        "description": "L2 processor being used (flag values: ISD, GPP)",
+        "units": "flag",
+        "value": ["ISD", "ISD", "ISD"]
+    },
+	"plot_fitted_waveforms_bs": {
+        "description": "Plot fitted waveforms of each baseline",
+        "value": [0,0,0]
+    },
+	"figure_format": {
+        "description": "Flag to indicate the type of output figure to be generated (png, jpg, eps)",
+        "value": "png"
+    },
+	"res_fig": {
+        "description": "Flag to indicate the resolution of output figures to be generated",
+        "value": "-r0"
+    },
+	"color_bs": {
+        "description": "Color palette to be used in output figures - colorblind",
+        "value": [86/255, 180/255, 233/255; 230/255, 159/255, 0/255; 0/255, 158/255, 115/255; 213/255, 94/255, 0/255; 0/255, 114/255, 178/255; 204/255, 121/255, 167/255; 240/255, 228/255, 66/255; 0/255, 0/255, 0/255]
+    },
+	"plot_downsampling": {
+        "description": "Downsampling of the surfaces to be ploted: every each number of surfaces the plot is generated and saved",
+        "value": 10
+    },
+	"text_interpreter": {
+        "description": "Flag to indicate the text font interpreter in output figures (tex, latex)",
+        "value": "tex"
+    },
+	"default_fontsize": {
+        "description": "Flag to indicate the fontsize of output figure to be generated",
+        "value": 18
+    },
+	"textbox_fontsize": {
+        "description": "Flag to indicate the fontsize of text in boxes of output figures",
+        "value": 17
+    },
+	"legend_fontsize": {
+        "description": "Flag to indicate the fontsize of legends in boxes of output figures",
+        "value": 18
+    },
+	"default_fontname": {
+        "description": "Flag to indicate the fontname of text in output figures",
+        "value": "Arial"
+    },
+	"default_figuresize": {
+        "description": "Flag to indicate the size of output figures",
+        "value":  [1920,1080]
+    },
+	"default_linewidth": {
+        "description": "Flag to indicate the linewidth of lines in output figures",
+        "value": 2
+    },
+	"overlay_baselines": {
+        "description": "Flag to indicate whether waveforms of different baselines shall be added in the same output figure",
+        "value": 1
+    },
+	"num_pools": {
+        "description": "Flag to indicate the number of pools to be used in parallel computing",
+        "value": 1
+    },
+	"default_markersize": {
+        "description": "Flag to indicate the size of marks in the output figures of geophysical estimates",
+        "value": 5
+    },
+	"LineStyle": {
+        "description": "Flag to indicate the line style connecting marks in the output figures of geophysical estimates",
+        "value": "none"
+    },
+	"marker_bs": {
+        "description": "Flag to indicate the marker style in the output figures of geophysical estimates",
+        "value": ['^','o','v','x','p','s','.']
+    },
+	"win_size_detrending": {
+        "description": "Size of the window (number of surfaces) to compute statistics of geophysical parameters estimates",
+        "value": 20
+    },
+	"flag_outliers_removal": {
+        "description": "Flag to indicate whether outliers of geophysical estimates shall be removed fromm the sample for the statisical analysis",
+        "value": 1
+    },
+	"type_outliers_removal": {
+        "description": "Flag to indicate the definition of outliers used if outliers are removed. Only Tukey's fences definition is considered",
+        "value": "tukey_fence"
+    },
+	"smooth_param": {
+        "description": "Flag to indicate whether smoothing (with win_size_detrending window size) is performed in the statistical analysis of geophysical estimates",
+        "value": 1
+    },
+	"generate_plots": {
+        "description": "Flag to indicate whether output plots shall be generated",
+        "value": 1
+    },
+	"generate_plot_SSH": {
+        "description": "Flag to indicate whether SSH plots shall be generated",
+        "value": 1
+    },
+	"generate_plot_SWH": {
+        "description": "Flag to indicate whether SWH plots shall be generated",
+        "value": 1
+    },
+	"generate_plot_sigma0": {
+        "description": "Flag to indicate whether sigma^0 plots shall be generated",
+        "value": 1
+    },
+	"generate_plot_COR": {
+        "description": "Flag to indicate whether Pearson correlation plots shall be generated",
+        "value": 1
+    },
+	"filter_ISR_baselines_mask": {
+        "description": "Flag that activates filtering with a Mask. Not used in this version",
+        "value": 0
+    },
+	"performance_latitude_range": {
+        "description": "Range of min and max latitudes of retrieved parameters to be analyzed",
+        "value": [-inf,+inf]
+    },
+	"save_figure_format_fig": {
+        "description": "Flag to indicate whether output figures in .fig format shall be generated",
+        "value": 1
+    },
+    	"input_path_L1_ISR_bs": {
+        "description": "String array containing path to the input L1B product files according to the name_bs order",
+        "units": "flag",
+        "value": ["/home/agranados/data/S6_GPP/S6_comparison_range_walk_ocog/inputs/L1B/default/", "/home/agranados/data/S6_GPP/S6_comparison_range_walk_ocog/inputs/L1B/OCOG_wincorrected_2/", "/home/agranados/data/S6_GPP/S6_comparison_range_walk_ocog/inputs/L1B/range_walk/"]
+    },
+    	"input_path_L2_ISR_bs": {
+        "description": "String array containing path to the input L2 product files according to the name_bs order. Strings shall be empty if the tool runs the L2 processor for the corresponding baseline. In that case, the string or path will correspond to output_path_L2_ISR_bs",
+        "units": "flag",
+        "value": ["", "", ""]
+    },
+    	"output_data_path": {
+        "description": "File system path to the directory containing the output products generated by the tool",
+        "units": "flag",
+        "value": "/home/agranados/data/S6_GPP/S6_comparison_range_walk_ocog/results/"
+    },
+    	"path_to_L2_processor": {
+        "description": "File system path to the directory containing the L2 HR processor source code",
+        "units": "flag",
+        "value": "/home/agranados/S6_GPP/matlab/S6_WAVEFORM_FITTING/scripts/L2_processors/HR/retracker/"
+    },
+    	"cnf_chd_cst_path": {
+        "description": "Path to the directory containing the different configuration, characterization and constant definition files, and the Look Up Tables (LUTs) for the f0 and f1 functions to be used by the power waveform fitting routine",
+        "units": "flag",
+        "value": "/home/agranados/data/S6_GPP/S6_comparison_range_walk_ocog/inputs/cnf_chd_cst_LUTs/"
+    }
+}
