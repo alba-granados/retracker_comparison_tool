@@ -70,10 +70,10 @@ empty_flag=ones(1,length(filesBulk)); % skip file - exit function - if file does
 
 i_baseline = 1;
 
-filename_L2{i_baseline}=char(filesBulk(i_baseline).L2Files(i_fileL2_input).name);
+filename_L2{i_baseline}=char(filesBulk(i_baseline).L2Files(i_fileL2_input).name); % no path
 [~,aux,fileext_L2]=fileparts(filename_L2{i_baseline});
 data_string=aux(21:21+30); % alba: take sensing time.
-filename_L2{i_baseline}=strcat(char(filesBulk(i_baseline).input_path_L2_ISR_bs),filename_L2{i_baseline});
+filename_L2{i_baseline}=strcat(char(filesBulk(i_baseline).input_path_L2_ISR_bs),filename_L2{i_baseline}); % with path
 
 input_L1_ISR_Files=dir(fullfile(char(filesBulk(i_baseline).input_path_L1_ISR_bs),['*' data_string '*'])); 
 if ~isempty(input_L1_ISR_Files)
@@ -133,8 +133,10 @@ end
 
 for i_baseline=1:N_baselines
     
-    mode = '';
-    if ~isempty(find(ismember(strsplit(filename_L2{i_baseline}, '_'), 'LR')))
+    mode = 'HR';
+    if any(contains(filename_L2{i_baseline},'LROS'))
+        mode = 'LR';
+    elseif any(contains(filename_L2{i_baseline},'LR'))
         mode = 'LR';
     end
     

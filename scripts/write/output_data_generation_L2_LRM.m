@@ -57,7 +57,7 @@ out.s0_sf       =   data.HRM.s0_sf; %sigma scale factor copied from L1B in dBs
 %--------------------------------------------------------------------------
 for i_retracker=1: length(cnf_p.retracker_name)    
     switch char(cnf_p.retracker_name(i_retracker))
-        case {'LRM'}
+        case {'LR'}
             out.RETRACKER.LR.Epoch           =   retrackers_results.LR.Epoch;
             out.RETRACKER.LR.Pu              =   retrackers_results.LR.Pu;   
             out.RETRACKER.LR.SSH             =   retrackers_results.LR.SSH;     

@@ -166,7 +166,7 @@ s0_scale_factor_20_ku=int16(out.s0_sf.*1e2);
 %--------------------------------------------------------------------------
 for i_retracker=1: length(cnf_p.retracker_name)
     switch char(cnf_p.retracker_name(i_retracker))
-        case {'LRM'}
+        case {'LR'}
             epoch_LR_20_ku_name = 'epoch_LR_20_ku';
             id_aux = netcdf.defVar(ncid,epoch_LR_20_ku_name,int32_type, ku_rec_dimension);
             %             netcdf.defVarFill(ncid,id_aux,false,2147483647);
@@ -368,7 +368,7 @@ netcdf.putVar(ncid,var_id,s0_scale_factor_20_ku);
 %--------------------------------------------------------------------------
 for i_retracker=1: length(cnf_p.retracker_name)
     switch char(cnf_p.retracker_name(i_retracker))            
-        case 'LRM'
+        case 'LR'
             var_id=netcdf.inqVarID(ncid,'epoch_LR_20_ku');
             netcdf.putVar(ncid,var_id,epoch_LR_20_ku);
             
