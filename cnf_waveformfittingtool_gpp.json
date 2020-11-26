@@ -41,7 +41,7 @@
     },
 	"color_bs": {
         "description": "Color palette to be used in output figures - colorblind",
-        "value": [68/255, 119/255, 170/255; 204/255, 187/255, 68/255; 187/255, 85/255, 102/255; 34/255, 136/255, 51/255]
+        "value": [86/255, 180/255, 233/255; 230/255, 159/255, 0/255; 0/255, 158/255, 115/255; 213/255, 94/255, 0/255; 0/255, 114/255, 178/255; 204/255, 121/255, 167/255; 240/255, 228/255, 66/255; 0/255, 0/255, 0/255]
     },
 	"plot_downsampling": {
         "description": "Downsampling of the surfaces to be ploted: every each number of surfaces the plot is generated and saved",
@@ -79,6 +79,10 @@
         "description": "Flag to indicate whether waveforms of different baselines shall be added in the same output figure",
         "value": 1
     },
+	"num_pools": {
+        "description": "Flag to indicate the number of pools to be used in parallel computing",
+        "value": 1
+    },
 	"default_markersize": {
         "description": "Flag to indicate the size of marks in the output figures of geophysical estimates",
         "value": 7
@@ -94,6 +98,10 @@
 	"win_size_detrending": {
         "description": "Size of the window (number of surfaces) to compute statistics of geophysical parameters estimates",
         "value": 20
+    },
+	"visible_figures": {
+        "description": "Flag to indicate whether matlab figures shall be visible during processing",
+        "value": "on"
     },
 	"flag_outliers_removal": {
         "description": "Flag to indicate whether outliers of geophysical estimates shall be removed fromm the sample for the statisical analysis",

@@ -79,6 +79,10 @@
         "description": "Flag to indicate whether waveforms of different baselines shall be added in the same output figure",
         "value": 1
     },
+	"num_pools": {
+        "description": "Flag to indicate the number of pools to be used in parallel computing",
+        "value": 1
+    },
 	"default_markersize": {
         "description": "Flag to indicate the size of marks in the output figures of geophysical estimates",
         "value": 7
@@ -94,6 +98,10 @@
 	"win_size_detrending": {
         "description": "Size of the window (number of surfaces) to compute statistics of geophysical parameters estimates",
         "value": 20
+    },
+	"visible_figures": {
+        "description": "Flag to indicate whether matlab figures shall be visible during processing",
+        "value": "on"
     },
 	"flag_outliers_removal": {
         "description": "Flag to indicate whether outliers of geophysical estimates shall be removed fromm the sample for the statisical analysis",
