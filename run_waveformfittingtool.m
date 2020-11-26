@@ -67,7 +67,7 @@ end
 
 % Default path to configuration file
 cnf_waveformfittingtool_path  = strcat(pwd, filesep);    
-tool_bsln_id = 'range_walk_ocog.json';
+tool_bsln_id = 'lr.json';
 inputFiles      =   dir(cnf_waveformfittingtool_path);
 aux=struct2cell(inputFiles); aux=aux(1,:); %Keep the
 if ~isempty(tool_bsln_id)
@@ -223,34 +223,35 @@ filename_mask_KML='';
 %% run L2 processors and define L2 product input path for model fit tool
 
 for i_baseline=1:num_baselines 
-    if strcmp(name_bs(i_baseline), 'LRM') && cnf_tool.run_L2(i_baseline)
-        
-        fprintf('\nRunning L2 LR processor...\n');
+    if cnf_tool.run_L2(i_baseline)
+        switch char(name_bs(i_baseline))
+            case {'LRM', 'LROS-RAW', 'LROS-RMC'} 
+                fprintf('\nRunning L2 LR processor...\n');
 
-        if ~exist(char(output_path_L2_ISR_bs(i_baseline)), 'dir')
-            mkdir(char(output_path_L2_ISR_bs(i_baseline)));
-        end
+                if ~exist(char(output_path_L2_ISR_bs(i_baseline)), 'dir')
+                    mkdir(char(output_path_L2_ISR_bs(i_baseline)));
+                end
 
-        L2_LRM_S6_modelfittool(char(input_path_L1_ISR_bs(i_baseline)), char(output_path_L2_ISR_bs(i_baseline)), cnf_chd_cst_path,  cnf_tool,...
-            'proc_bsln_id',proc_bsln_id);
-        
-        % redefine L2 product input path for model fit tool is output/data/ of L2 processors
-        input_path_L2_ISR_bs{i_baseline} = cellstr(strcat(output_path_L2_ISR_bs(i_baseline), 'data', filesep));   
+                L2_LRM_S6_modelfittool(char(input_path_L1_ISR_bs(i_baseline)), char(output_path_L2_ISR_bs(i_baseline)), cnf_chd_cst_path,  cnf_tool,...
+                    'proc_bsln_id',proc_bsln_id, 'MODE', char(name_bs(i_baseline)));
 
-    elseif ~strcmp(name_bs(i_baseline), 'LRM') && cnf_tool.run_L2(i_baseline)
-        
-        fprintf('Running L2 HR processor...\n\n');
+                % redefine L2 product input path for model fit tool is output/data/ of L2 processors
+                input_path_L2_ISR_bs{i_baseline} = cellstr(strcat(output_path_L2_ISR_bs(i_baseline), 'data', filesep));   
 
-        if ~exist(char(output_path_L2_ISR_bs(i_baseline)), 'dir')
-            mkdir(char(output_path_L2_ISR_bs(i_baseline)));
-        end
+            otherwise
+                fprintf('Running L2 HR processor...\n\n');
 
-        L2_bulk_processing_paralelization(char(input_path_L1_ISR_bs(i_baseline)),char(output_path_L2_ISR_bs(i_baseline)),cnf_chd_cst_path, ...
-            'proc_bsln_id',proc_bsln_id, 'num_pools',num_pools);
-        
-        % redefine L2 product input path for model fit tool is output/data/ of L2 processors
-        input_path_L2_ISR_bs(i_baseline) = cellstr(strcat(output_path_L2_ISR_bs(i_baseline), 'data', filesep));   
-    end 
+                if ~exist(char(output_path_L2_ISR_bs(i_baseline)), 'dir')
+                    mkdir(char(output_path_L2_ISR_bs(i_baseline)));
+                end
+
+                L2_bulk_processing_paralelization(char(input_path_L1_ISR_bs(i_baseline)),char(output_path_L2_ISR_bs(i_baseline)),cnf_chd_cst_path, ...
+                    'proc_bsln_id',proc_bsln_id, 'num_pools',num_pools);
+
+                % redefine L2 product input path for model fit tool is output/data/ of L2 processors
+                input_path_L2_ISR_bs(i_baseline) = cellstr(strcat(output_path_L2_ISR_bs(i_baseline), 'data', filesep));   
+        end 
+    end
 end
 
 
