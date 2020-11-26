@@ -118,19 +118,20 @@ cst_p=read_CST_json(filesBulk.CST_file); %CST --> provide the global constant va
 
 %% Editing
 
-cnf_p.retracker_name = {'LRM'};
+cnf_p.retracker_name = {'LR'};
 cnf_p.mode = MODE;
 
 % Thermal noise or noise floor estimation window configuration
-if strcmp(MODE,'LROS_RMC')
-    cnf_p.TNini             =   25; % window positioning initial range bin for thermal noise estimation
-    cnf_p.TNlast            =   35; % window positioning last range bin for thermal noise estimation
-else
-    cnf_p.TNini             =   10; % window positioning initial range bin for thermal noise estimation
-    cnf_p.TNlast            =   20; % window positioning last range bin for thermal noise estimation
+switch MODE
+    case {'LROS-RMC', 'LROS-RAW'}
+        cnf_p.TNini             =   25; % window positioning initial range bin for thermal noise estimation
+        cnf_p.TNlast            =   35; % window positioning last range bin for thermal noise estimation
+    case {'LRM'}
+        cnf_p.TNini             =   10; % window positioning initial range bin for thermal noise estimation
+        cnf_p.TNlast            =   20; % window positioning last range bin for thermal noise estimation
 end
 
-cnf_p.ini_Epoch             =   110; %50;   % Epoch initial values --> this can be estimated from the max peak detection or leave it like this
+cnf_p.ini_Epoch             =   50; % Alba: it is better 50 as an approx. 110;    % Epoch initial values --> this can be estimated from the max peak detection or leave it like this
 cnf_p.ini_Hs                =   2; %1;  % SWH initial value
 cnf_p.ini_Pu                =   1;    % Initial amplitude
 % % note we assume xi = misspointing = to zero , otherwise we would have to
@@ -170,7 +171,7 @@ indexFilesL1B=find(filterDATAFILES);
 filesBulk.nFilesL1B=length(indexFilesL1B);
 filesBulk.L1BFiles=inputFiles(indexFilesL1B);
 
-fprintf('\nTotal number of LRM-L1B files to be processed: %d\n', filesBulk.nFilesL1B);
+fprintf('\nTotal number of LR-L1B files to be processed: %d\n', filesBulk.nFilesL1B);
 
 
 %% ------------- Loop per file to be processed ------------------------
@@ -212,7 +213,8 @@ for i_fileL1B_input=1:filesBulk.nFilesL1B
     netcdf.close(ncid);
 
     nf_p.rt                 =   1/(nf_p.BWClock*cnf_p.ZP(1));
-    nf_p.Ns                 =   N_samples*cnf_p.ZP;
+%     nf_p.Ns                 =   N_samples*cnf_p.ZP;
+    nf_p.Ns                 =   N_samples; % Alba: N_samples alread oversampled
     % nf_p.Ns                 =   256*cnf_p.ZP;
     cnf_p.ZP_sample         =   nf_p.Ns/2 + 1; % Mid window location to compensate Epoch and range
     
@@ -229,21 +231,23 @@ for i_fileL1B_input=1:filesBulk.nFilesL1B
     data.alpha_c    =   1 + (data.GEO.H)./data.Re;
     data.h          =   data.GEO.H.*data.alpha_c;
 
-    if strcmp(MODE,'LRM')
-        wfm_init    = ones(1,length(data.GEO.LAT));
-        wfm_last    = ones(1,length(data.GEO.LAT)) * nf_p.Ns;
-    else
-        wfm_init    =   double(ncread([cnf_p.MainPath,cnf_p.Filename],['/data_20/',BAND,'/lr_os_first_valid_sample']))+1;
-        wfm_last    =   double(ncread([cnf_p.MainPath,cnf_p.Filename],['/data_20/',BAND,'/lr_os_last_valid_sample']))+1;
-    end
-
-    if strcmp(MODE,'LRM')
-%         wfm_lrm         =   double(ncread([cnf_p.MainPath,cnf_p.Filename],['/data_20/',BAND,'/power_waveform']));
-        i2q2_meas         =   double(ncread([cnf_p.MainPath,cnf_p.Filename],['/data_20/',BAND,'/power_waveform'])).';
-    else
-        wfm_lrm         =   double(ncread([cnf_p.MainPath,cnf_p.Filename],['/data_20/',BAND,'/lr_rmc_power_waveform']));
+    switch MODE
+        case {'LRM'}
+            wfm_init    = ones(1,length(data.GEO.LAT));
+            wfm_last    = ones(1,length(data.GEO.LAT)) * nf_p.Ns;
+            %         wfm_lrm         =   double(ncread([cnf_p.MainPath,cnf_p.Filename],['/data_20/',BAND,'/power_waveform']));
+            i2q2_meas         =   double(ncread([cnf_p.MainPath,cnf_p.Filename],['/data_20/',BAND,'/power_waveform'])).';
+        case {'LROS-RAW', 'LROS-RMC'}
+            wfm_init    =   double(ncread([cnf_p.MainPath,cnf_p.Filename],['/data_20/',BAND,'/lr_os_first_valid_sample']))+1;
+            wfm_last    =   double(ncread([cnf_p.MainPath,cnf_p.Filename],['/data_20/',BAND,'/lr_os_last_valid_sample']))+1;
+            i2q2_meas         =   double(ncread([cnf_p.MainPath,cnf_p.Filename],['/data_20/',BAND,'/power_waveform'])).';
+        case {'RMC'}
+            wfm_init    =   double(ncread([cnf_p.MainPath,cnf_p.Filename],['/data_20/',BAND,'/lr_os_first_valid_sample']))+1;
+            wfm_last    =   double(ncread([cnf_p.MainPath,cnf_p.Filename],['/data_20/',BAND,'/lr_os_last_valid_sample']))+1;
+            wfm_lrm         =   double(ncread([cnf_p.MainPath,cnf_p.Filename],['/data_20/',BAND,'/lr_rmc_power_waveform']));
 %     i2q2_meas         =   double(ncread([cnf_p.MainPath,cnf_p.Filename],['/data_20/',BAND,'/lr_rmc_power_waveform']));
     end
+    
     wfm_sc_ft       =   double(ncread([cnf_p.MainPath,cnf_p.Filename],['/data_20/',BAND,'/waveform_scale_factor']));
     wfm_lrm=(i2q2_meas.*repmat(wfm_sc_ft,1,nf_p.Ns)).';     %apply scaling factor to waveforms
     data.HRM.s0_sf    =   double(ncread([cnf_p.MainPath,cnf_p.Filename],['/data_20/',BAND,'/sig0_scaling_factor']));
@@ -272,15 +276,16 @@ for i_fileL1B_input=1:filesBulk.nFilesL1B
         nf_p.xi         =   data.xi(m);
         nf_p.h          =   data.h(m);
     %     index           =   find(wfm_lrm(:,m) >= 1.3*mean(wfm_lrm(1:10,m)));
-        if strcmp(MODE,'RAW')
-            noise_th(m)     =   2*mean(wfm_lrm_norm(cnf_p.TNini*cnf_p.ZP:cnf_p.TNlast*cnf_p.ZP,m));
-            le_index        =   find(wfm_lrm_norm(1:nf_p.Ns/2,m) >= noise_th(m));
-        elseif strcmp(MODE,'RMC')
-            noise_th(m)     =   2*mean(wfm_lrm_norm(cnf_p.TNini*cnf_p.ZP:cnf_p.TNlast*cnf_p.ZP,m));
-            le_index        =   find(wfm_lrm_norm(1:nf_p.Ns/2,m) >= noise_th(m));
-        else
-            noise_th(m)     =   1.4*mean(wfm_lrm_norm(cnf_p.TNini*cnf_p.ZP:cnf_p.TNlast*cnf_p.ZP,m));
-            le_index        =   find(wfm_lrm_norm(:,m) >= noise_th(m));
+        switch MODE
+            case {'RAW'} % Alba: ?
+                noise_th(m)     =   2*mean(wfm_lrm_norm(cnf_p.TNini*cnf_p.ZP:cnf_p.TNlast*cnf_p.ZP,m));
+                le_index        =   find(wfm_lrm_norm(1:nf_p.Ns/2,m) >= noise_th(m));
+            case {'RMC'} % Alba: ?
+                noise_th(m)     =   2*mean(wfm_lrm_norm(cnf_p.TNini*cnf_p.ZP:cnf_p.TNlast*cnf_p.ZP,m));
+                le_index        =   find(wfm_lrm_norm(1:nf_p.Ns/2,m) >= noise_th(m));
+            otherwise
+                noise_th(m)     =   1.4*mean(wfm_lrm_norm(cnf_p.TNini*cnf_p.ZP:cnf_p.TNlast*cnf_p.ZP,m));
+                le_index        =   find(wfm_lrm_norm(:,m) >= noise_th(m));
         end
         if (~isempty(find(diff(le_index)>1,1)))
             le_index = le_index(find(diff(le_index)>1)+1:length(le_index)); %to make sure there are not some higher samples at the beginning
