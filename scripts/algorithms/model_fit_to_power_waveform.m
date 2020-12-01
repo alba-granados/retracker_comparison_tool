@@ -101,6 +101,7 @@ LUT_f1_file = filesBulk(1).LUT_f1_file;
 %% ----------- READING FILE FOR EACH BASELINE -----------------------------
 
 indx_LR = 0;
+bsl_HR = 1;
 
 for i_baseline=1:N_baselines
         
@@ -114,7 +115,9 @@ for i_baseline=1:N_baselines
     % required function for analytical curve reconstruction
     [data{i_baseline},flag] = read_alt_data_EM (filename_L1_ISR{i_baseline}, cnf_p,cst_p,chd_p,'filename_mask_KML',filename_mask_KML);
 
-    if i_baseline == 1
+    if bsl_HR == 1 && ~isempty(find(ismember(strsplit(filename_L1_ISR{i_baseline}, '_'), 'HR')))
+        bsl_HR = i_baseline;
+        
         cnf_p.rou_flag=0;
         [nf_p] = gen_nonfit_params_EM (data{i_baseline},cnf_p,chd_p,cst_p); 
 
@@ -204,7 +207,7 @@ for m = 1:L2_num_surfaces
         
 	    f1=figure;
 	    textbox_string = {''};
-	    
+        
 	    for i_baseline=1:N_baselines
 
             if i_baseline == indx_LR || ~cnf_tool.plot_fitted_waveforms_bs(i_baseline)
