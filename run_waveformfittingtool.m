@@ -67,7 +67,7 @@ end
 
 % Default path to configuration file
 cnf_waveformfittingtool_path  = strcat(pwd, filesep);    
-tool_bsln_id = 'lr.json';
+tool_bsln_id = 'S6_LX2_CL.json';
 inputFiles      =   dir(cnf_waveformfittingtool_path);
 aux=struct2cell(inputFiles); aux=aux(1,:); %Keep the
 if ~isempty(tool_bsln_id)
@@ -234,7 +234,6 @@ for i_baseline=1:num_baselines
 
                 L2_LRM_S6_modelfittool(char(input_path_L1_ISR_bs(i_baseline)), char(output_path_L2_ISR_bs(i_baseline)), cnf_chd_cst_path,  cnf_tool,...
                     'proc_bsln_id',proc_bsln_id, 'MODE', char(name_bs(i_baseline)));
-
                 % redefine L2 product input path for model fit tool is output/data/ of L2 processors
                 input_path_L2_ISR_bs{i_baseline} = cellstr(strcat(output_path_L2_ISR_bs(i_baseline), 'data', filesep));   
 
@@ -247,7 +246,6 @@ for i_baseline=1:num_baselines
 
                 L2_bulk_processing_paralelization(char(input_path_L1_ISR_bs(i_baseline)),char(output_path_L2_ISR_bs(i_baseline)),cnf_chd_cst_path, ...
                     'proc_bsln_id',proc_bsln_id, 'num_pools',num_pools);
-
                 % redefine L2 product input path for model fit tool is output/data/ of L2 processors
                 input_path_L2_ISR_bs(i_baseline) = cellstr(strcat(output_path_L2_ISR_bs(i_baseline), 'data', filesep));   
         end 
@@ -371,7 +369,7 @@ for i_fileL2_input=1:filesBulk(1).nFilesL2
     
     if flag==1        
 %         if ~cnf_tool.run_L2 
-        fprintf('\nPlotting fitted power waveforms of file %s...\n\n', filenopath);
+        fprintf('\nPlotting fitted power waveforms...\n');
 
         model_fit_to_power_waveform(filesBulk, name_bs, cnf_p, cst_p, chd_p, filename_L1, SWH, sigma0, epoch, Pu, COR, cnf_tool);
 %         end
