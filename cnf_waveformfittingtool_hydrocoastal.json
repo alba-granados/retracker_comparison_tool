@@ -73,7 +73,7 @@
     },
 	"default_linewidth": {
         "description": "Flag to indicate the linewidth of lines in output figures",
-        "value": 3
+        "value": 2
     },
 	"overlay_baselines": {
         "description": "Flag to indicate whether waveforms of different baselines shall be added in the same output figure",
@@ -83,9 +83,13 @@
         "description": "Flag to indicate the number of pools to be used in parallel computing",
         "value": 1
     },
+	"discard_records_begin": {
+        "description": "Only valid for LR fitting: Number of records at the beginning of track to be masked - fit parameters set to NaN",
+        "value": 40
+    },
 	"default_markersize": {
         "description": "Flag to indicate the size of marks in the output figures of geophysical estimates",
-        "value": 7
+        "value": 4
     },
 	"LineStyle": {
         "description": "Flag to indicate the line style connecting marks in the output figures of geophysical estimates",

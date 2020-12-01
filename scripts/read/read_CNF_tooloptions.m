@@ -32,8 +32,9 @@ function [cnf_p]=read_CNF_tooloptions(cnf_file)
     cnf_p.default_markersize=struct.default_markersize.value;
     cnf_p.save_figure_format_fig=struct.save_figure_format_fig.value;
     cnf_p.visible_figures = struct.visible_figures.value;
+    
     cnf_p.num_pools = struct.num_pools.value;
-        
+    cnf_p.discard_records_begin = struct.discard_records_begin;    
     % retrieved parameters performance analysis
     cnf_p.LineStyle=struct.LineStyle.value;
     cnf_p.marker_bs=struct.marker_bs.value;

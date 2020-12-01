@@ -121,6 +121,8 @@ cst_p=read_CST_json(filesBulk.CST_file); %CST --> provide the global constant va
 cnf_p.retracker_name = {'LR'};
 cnf_p.mode = MODE;
 
+discard_records_begin=cnf_tool.discard_records_begin;
+
 % Thermal noise or noise floor estimation window configuration
 switch MODE
     case {'LROS-RMC', 'LROS-RAW'}
@@ -251,7 +253,7 @@ for i_fileL1B_input=1:filesBulk.nFilesL1B
     wfm_sc_ft       =   double(ncread([cnf_p.MainPath,cnf_p.Filename],['/data_20/',BAND,'/waveform_scale_factor']));
     wfm_lrm=(i2q2_meas.*repmat(wfm_sc_ft,1,nf_p.Ns)).';     %apply scaling factor to waveforms
     data.HRM.s0_sf    =   double(ncread([cnf_p.MainPath,cnf_p.Filename],['/data_20/',BAND,'/sig0_scaling_factor']));
-
+    
     N_records = length(data.GEO.LAT);
     data.N_records = N_records;
     
@@ -317,7 +319,11 @@ for i_fileL1B_input=1:filesBulk.nFilesL1B
 
         [fit_params,~,res,flagfit]     =   lsqcurvefit(mpfun,fit_params_ini,(1:length(fit_wfm)),fit_wfm,[],[],options);          
 
-        fit_params_ini      = fit_params;
+        if m < discard_records_begin
+           fit_params = [NaN, NaN, NaN];  
+        else        
+            fit_params_ini      = fit_params;
+        end
         out.Epoch(m)        = fit_params(1) + wfm_init(m) - 1;
     %     out.Epoch(m)    =   fit_params(1)*395/320;
         out.Hs(m)           =   fit_params(2) * nf_p.BWClock/nf_p.BWsampl;
@@ -388,16 +394,19 @@ for i_fileL1B_input=1:filesBulk.nFilesL1B
     out.SSH             = data.GEO.H - data.MEA.win_delay - out.retracking_cor;
     % Filtering outliers
     TH          = 1.5;
-    indexs      = ((abs(out.Hs) < (mean(abs(out.Hs)) + TH*mean(abs(out.Hs))))  &  (abs(out.Hs) > (mean(abs(out.Hs)) - TH*mean(abs(out.Hs)))));
-    % indexs      = out.COR > .9925;
-    % indexs      = logical(ones(1,length(data.GEO.LAT)));
-    % ssh_aux = abs(out.SSH(indexs));
-    % indexs      = ssh_aux > 11;
-    out.SSH     = out.SSH(indexs);
-%     out.SSH = (com_altitude_ku-altimeter_range_calibrated_ku - (out.Epoch-cnf_p.ZP_sample+index-1)/cnf_p.ZP*nf_p.c*0.5/nf_p.BWClock).';
-    out.Hs      = abs(out.Hs(indexs));
-    out.sigma0  = out.sigma0(indexs);
-    data.GEO.LAT    = data.GEO.LAT(indexs);
+    indexs      = ((abs(out.Hs) < (nanmean(abs(out.Hs)) + TH*nanmean(abs(out.Hs))))  &  (abs(out.Hs) > (nanmean(abs(out.Hs)) - TH*nanmean(abs(out.Hs)))));
+%     % indexs      = out.COR > .9925;
+%     % indexs      = logical(ones(1,length(data.GEO.LAT)));
+%     % ssh_aux = abs(out.SSH(indexs));
+%     % indexs      = ssh_aux > 11;
+% %     out.SSH     = out.SSH(indexs);
+%     out.SSH(indexs)     = NaN;
+% %     out.SSH = (com_altitude_ku-altimeter_range_calibrated_ku - (out.Epoch-cnf_p.ZP_sample+index-1)/cnf_p.ZP*nf_p.c*0.5/nf_p.BWClock).';
+% %     out.Hs      = abs(out.Hs(indexs));
+    out.Hs      = abs(out.Hs);
+%     out.Hs(indexs)      = NaN;
+%     out.sigma0(indexs)  = NaN;
+% %     data.GEO.LAT    = data.GEO.LAT(indexs);
 
     
 %% -------------- ORGANIZE THE OUTPUT DATA --------------------------------

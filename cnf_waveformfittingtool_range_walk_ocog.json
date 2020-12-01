@@ -83,9 +83,13 @@
         "description": "Flag to indicate the number of pools to be used in parallel computing",
         "value": 1
     },
+	"discard_records_begin": {
+        "description": "Only valid for LR fitting: Number of records at the beginning of track to be masked - fit parameters set to NaN",
+        "value": 0
+    },
 	"default_markersize": {
         "description": "Flag to indicate the size of marks in the output figures of geophysical estimates",
-        "value": 5
+        "value": 4
     },
 	"LineStyle": {
         "description": "Flag to indicate the line style connecting marks in the output figures of geophysical estimates",
