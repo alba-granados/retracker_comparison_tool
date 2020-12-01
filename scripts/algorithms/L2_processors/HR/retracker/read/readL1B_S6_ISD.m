@@ -82,9 +82,12 @@ switch ext
 
 %         dimid=netcdf.inqDimID(ncid,'ns');
         [~,filename_L1B_nopath,~]=fileparts(filename_L1B);
-        if any(strcmp(split(filename_L1B_nopath,'_'), 'range')) 
+        name_split = split(filename_L1B_nopath,'_');
+        if any(strcmp(name_split, 'range'))
             dimid=netcdf.inqDimID(ncid,'samples_no');
-        else % range_walk processing and ocog
+        elseif any(strcmp(name_split, 'HR'))
+            dimid=netcdf.inqDimID(ncid,'samples_ov');
+        else 
             dimid=netcdf.inqDimID(ncid,'samples'); 
         end
         [~,N_samples]=netcdf.inqDim(ncid,dimid);
