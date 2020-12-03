@@ -232,7 +232,7 @@ for i_fileL1B_input=1:filesBulk.nFilesL1B
     data.xi         =   data.GEO.pitch*pi/180; %mispointing
     data.alpha_c    =   1 + (data.GEO.H)./data.Re;
     data.h          =   data.GEO.H.*data.alpha_c;
-
+    
     switch MODE
         case {'LRM'}
             wfm_init    = ones(1,length(data.GEO.LAT));
@@ -256,6 +256,7 @@ for i_fileL1B_input=1:filesBulk.nFilesL1B
     
     N_records = length(data.GEO.LAT);
     data.N_records = N_records;
+    fprintf('Total number of surface: %d\n', N_records);
     
     %t           =   1:cnf_p.Nfit_lim;
     options     =   optimset('Algorithm', 'levenberg-marquardt','Display','off');
@@ -294,6 +295,13 @@ for i_fileL1B_input=1:filesBulk.nFilesL1B
                                                                 %of the waveform and we have an index vector like [1,2,104,105,...]
         end
 
+        if ~isempty(le_index) % AGC: if noise floor is detected successfully
+            noise_ini = noise_th(m);
+            le_index_ini = le_index;
+        else
+            noise_th(m) = noise_ini;
+            le_index = le_index_ini;
+        end
         le_index           =   le_index(1);
         
 
@@ -319,11 +327,13 @@ for i_fileL1B_input=1:filesBulk.nFilesL1B
 
         [fit_params,~,res,flagfit]     =   lsqcurvefit(mpfun,fit_params_ini,(1:length(fit_wfm)),fit_wfm,[],[],options);          
 
-        if m < discard_records_begin
+        if flagfit==-1 || flagfit==-2 ||  (m < discard_records_begin)
+            %-1 algorithm terminated by the output function -2 Problem is infeasible: the bounds lb and ub are
+            %inconsistent (only for lsqcurvefit)
            fit_params = [NaN, NaN, NaN];  
-        else        
-            fit_params_ini      = fit_params;
+           fit_params_ini = [cnf_p.ini_Epoch cnf_p.ini_Hs cnf_p.ini_Pu];
         end
+        
         out.Epoch(m)        = fit_params(1) + wfm_init(m) - 1;
     %     out.Epoch(m)    =   fit_params(1)*395/320;
         out.Hs(m)           =   fit_params(2) * nf_p.BWClock/nf_p.BWsampl;
@@ -340,7 +350,8 @@ for i_fileL1B_input=1:filesBulk.nFilesL1B
         out.COR(m)          =   correlation_fit(1,2);
 
         if (mod(m,cnf_tool.plot_downsampling)==0) || (m==1)
-                        
+             
+            fprintf('plotting surface no. %d...\n', m);
 %             mida = get(0,'ScreenSize');
 %             mida(3:4)=cnf_tool.default_figuresize;
 %             set(0,'defaultFigurePaperUnits','points'); set(0,'defaultFigurePosition',mida);
@@ -359,16 +370,20 @@ for i_fileL1B_input=1:filesBulk.nFilesL1B
             grid on
             xlabel('range bin','Interpreter',cnf_tool.text_interpreter);
             if strcmp(cnf_tool.text_interpreter, 'latex')
-                title(sprintf('wav. \\# %d (LAT: %.4g deg)', m, data.GEO.LAT(m)), 'Interpreter',cnf_tool.text_interpreter); 
+                title_text = [sprintf('wav. \\# %d (LAT: %.4g deg)', m, data.GEO.LAT(m))];
                 textbox_string = {['Epoch = ', num2str(out.Epoch(m),4), ' [r.b]'],['SWH = ' ,num2str(abs(out.Hs(m)),4), ' [m]'],...
                                     ['Pu = ', num2str(out.Pu(m),4), ' [dB]'], ['$\rho$ = ', num2str(out.COR(m)*100,5), ' [\%]'], ...
                                     ['$sigma^0$ = ', num2str(out.Pu(m)+data.HRM.s0_sf(m)), ' [dB]'] };
             else
-                title(sprintf('wav. # %d (LAT: %.4g deg)', m, data.GEO.LAT(m)), 'Interpreter',cnf_tool.text_interpreter); 
+                title_text = [sprintf('wav. # %d (LAT: %.4g deg)', m, data.GEO.LAT(m))];
                 textbox_string = {['Epoch = ', num2str(out.Epoch(m),4), ' [r.b]'],['SWH = ' ,num2str(abs(out.Hs(m)),4), ' [m]'],...
                                     ['Pu = ', num2str(out.Pu(m),4), ' [dB]'], ['\rho = ', num2str(out.COR(m)*100,5), ' [%]'], ...
                                     ['\sigma^0 = ', num2str(out.Pu(m)+data.HRM.s0_sf(m)), ' [dB]'] };
             end
+            if isfield(data.GLOBAL_ATT.DATA_FILE_INFO, 'cycle_number')
+                title_text = [title_text, sprintf(' - cycle %d pass %d', data.GLOBAL_ATT.DATA_FILE_INFO.cycle_number, data.GLOBAL_ATT.DATA_FILE_INFO.pass_number)]; 
+            end
+            title(title_text, 'Interpreter',cnf_tool.text_interpreter); 
             annotation('textbox', [pos_leg(1),pos_leg(2)-pos_leg(4)-0.15,pos_leg(3),0.1],...
                                 'String',textbox_string,...
                                 'FontSize',cnf_tool.default_fontsize,'FitBoxToText','on',  'Interpreter',cnf_tool.text_interpreter);

@@ -107,7 +107,7 @@ for i_baseline=1:N_baselines
         
 %     fprintf('Num surfaces L2 (%s): %d\n', char(name_bs(i_baseline)), length(SWH{i_baseline}));    
 
-    if ~isempty(find(ismember(strsplit(filename_L1_ISR{i_baseline}, '_'), 'LR'))) || (~cnf_tool.plot_fitted_waveforms_bs(i_baseline))
+    if ~isempty(find(ismember(strsplit(filename_L1_ISR{i_baseline}, '_'), 'LR'))) || (~cnf_tool.plot_fitted_waveforms_bs(i_baseline)) % skip LR - check output L2 processor LR for fitted waveforms
         indx_LR = i_baseline;
         continue;
     end
@@ -443,11 +443,17 @@ for m = 1:L2_num_surfaces
                 plot([start_sample start_sample],y1, '--k', 'LineWidth',0.3);
                 grid on
                 xlabel('range bin',  'interpreter',text_interpreter);
+                
                 if strcmp(text_interpreter, 'latex')
-                    title(sprintf('wav. \\# %d (LAT: %.4g deg)', m, data{i_baseline}.GEO.LAT(m)), 'Interpreter', text_interpreter);     
+                    title_text = [sprintf('wav. \\# %d (LAT: %.4g deg)', m, data{i_baseline}.GEO.LAT(m))];
                 else
-                    title(sprintf('wav. # %d (LAT: %.4g deg)', m, data{i_baseline}.GEO.LAT(m)), 'Interpreter', text_interpreter); 
+                    title_text = [sprintf('wav. # %d (LAT: %.4g deg)', m, data{i_baseline}.GEO.LAT(m))];
+                end                
+                if isfield(data{i_baseline}.GLOBAL_ATT.DATA_FILE_INFO, 'cycle_number')
+                    title_text = [title_text, sprintf(' - cycle %d pass %d', data{i_baseline}.GLOBAL_ATT.DATA_FILE_INFO.cycle_number, data{i_baseline}.GLOBAL_ATT.DATA_FILE_INFO.pass_number)]; 
                 end
+                title(title_text, 'Interpreter',text_interpreter); 
+
                 axis([1 data{i_baseline}.N_samples 0 1.0]);
                 textbox_string=textbox_string(~cellfun(@isempty,textbox_string));
                 annotation('textbox', [pos_leg(1),pos_leg(2)-1.3*pos_leg(4),pos_leg(3),pos_leg(4)],...
@@ -491,11 +497,17 @@ for m = 1:L2_num_surfaces
             else
                 baseline_HR = i_baseline;
             end
+            
             if strcmp(text_interpreter, 'latex')
-                title(sprintf('wav. \\# %d (LAT: %.4g deg)', m, data{baseline_HR}.GEO.LAT(m)), 'Interpreter', text_interpreter); 
+                title_text = [sprintf('wav. \\# %d (LAT: %.4g deg)', m, data{baseline_HR}.GEO.LAT(m))];
             else
-                title(sprintf('wav. # %d (LAT: %.4g deg)', m, data{baseline_HR}.GEO.LAT(m)), 'Interpreter', text_interpreter); 
+                title_text = [sprintf('wav. # %d (LAT: %.4g deg)', m, data{baseline_HR}.GEO.LAT(m))];
+            end                
+            if isfield(data{baseline_HR}.GLOBAL_ATT.DATA_FILE_INFO, 'cycle_number')
+                title_text = [title_text, sprintf(' - cycle %d pass %d', data{baseline_HR}.GLOBAL_ATT.DATA_FILE_INFO.cycle_number, data{baseline_HR}.GLOBAL_ATT.DATA_FILE_INFO.pass_number)]; 
             end
+            title(title_text, 'Interpreter',text_interpreter); 
+                        
             axis([1 data{baseline_HR}.N_samples 0 1.0]);
 
             if indx_LR > 0

@@ -285,6 +285,8 @@ switch ext
 %             data.GLOBAL_ATT.DATA_FILE_INFO.semi_major_ellipsoid_axis=num2str(ncreadatt(filename_L1B,'/','semi_major_ellipsoid_axis'));
             data.GLOBAL_ATT.DATA_FILE_INFO.semi_major_ellipsoid_axis=num2str(ncreadatt(filename_L1B,'/','ellipsoid_semi_major_axis'));
             data.GLOBAL_ATT.DATA_FILE_INFO.ellipsoid_flattening=num2str(ncreadatt(filename_L1B,'/','ellipsoid_flattening'));
+            data.GLOBAL_ATT.DATA_FILE_INFO.cycle_number = ncreadatt(filename_L1B,'/','cycle_number');
+            data.GLOBAL_ATT.DATA_FILE_INFO.pass_number = ncreadatt(filename_L1B,'/','pass_number');
 
     case '.mat'
         %% ------------------------ Matlab data -------------------------------
@@ -718,7 +720,7 @@ switch ext
                     data.GLOBAL_ATT.DATA_FILE_INFO.xref_altimeter_ltm_c_cal2='Not available from @Matlab';
                     data.GLOBAL_ATT.DATA_FILE_INFO.xref_altimeter_characterisation='Not available from @Matlab';
                     data.GLOBAL_ATT.DATA_FILE_INFO.semi_major_ellipsoid_axis=num2str(cst_p.flat_coeff_cst);
-                    data.GLOBAL_ATT.DATA_FILE_INFO.ellipsoid_flattening=num2str(cst_p.semi_major_axis_cst);       
+                    data.GLOBAL_ATT.DATA_FILE_INFO.ellipsoid_flattening=num2str(cst_p.semi_major_axis_cst);      
         end              
         
     otherwise

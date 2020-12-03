@@ -67,7 +67,7 @@ end
 
 % Default path to configuration file
 cnf_waveformfittingtool_path  = strcat(pwd, filesep);    
-tool_bsln_id = 'S6_LX2_CL.json';
+tool_bsln_id = 'S6_LX2_CL_HR.json';
 inputFiles      =   dir(cnf_waveformfittingtool_path);
 aux=struct2cell(inputFiles); aux=aux(1,:); %Keep the
 if ~isempty(tool_bsln_id)
@@ -255,6 +255,8 @@ end
 
 %% ----------- FIND INPUT L2/L1B and config files -------------------------
 
+fprintf('\nRunning waveform fitting tool....\n');
+
 for i_baseline=1:num_baselines
     
     % --------- Define Paths -------------------------------------------------   
@@ -376,7 +378,7 @@ for i_fileL2_input=1:filesBulk(1).nFilesL2
 
         % ---------------- RUN RETRIEVED PARAMETERS COMPARISON ------------------
         
-        fprintf('\nPlotting comparison between retrieved parameters of file name %s...\n\n', filenopath);
+        fprintf('\nPlotting comparison between retrieved parameters file %s...\n\n', filenopath);
         performance_baselines_S6(SSH, SWH, sigma0, COR, filename_L2, index_inside_mask, name_bs, path_comparison_results, cnf_tool,...
                         'win_size_detrending',win_size_detrending,...
                         'flag_outliers_removal',flag_outliers_removal,...

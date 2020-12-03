@@ -273,17 +273,27 @@ ext_baselines_comp=strjoin(strrep(strrep(name_bs,' ','_'),'-','_'),'_vs_');
 %----------------------------------------------------------------------
 %--------------------- SSH --------------------------------------------
 
-index_baseline_compare_aux = 1:N_baselines;
-for i_baseline=1:N_baselines
-    if i_baseline == indx_LR
-        index_baseline_compare_aux(i_baseline) = [];
+if N_baselines > 1
+    index_baseline_compare_aux = 1:N_baselines;
+    for i_baseline=1:N_baselines
+        if i_baseline == indx_LR
+            index_baseline_compare_aux(i_baseline) = [];
+        end
     end
+    index_baseline_compare = nchoosek(index_baseline_compare_aux,2);
 end
-index_baseline_compare = nchoosek(index_baseline_compare_aux,2);
 
 [~,file_id,~]=fileparts(filename_L2_ISR{1});
 aux=strsplit(file_id, '_');
 text_title = aux(1:2);
+
+finfo = ncinfo(filename_L2_ISR{1});
+if any(ismember({finfo.Attributes.Name}, {'cycle_number'})) 
+    cycle_number = ncreadatt(filename_L2_ISR{1}, '/','cycle_number');
+    pass_number = ncreadatt(filename_L2_ISR{1}, '/','pass_number');
+    text_title = [text_title, sprintf(' - cycle %d pass %d', cycle_number, pass_number)]; 
+end
+
 
 text_interpreter=get(0, 'defaultAxesTickLabelInterpreter'); %cnf_p.text_interpreter;
 
@@ -336,53 +346,54 @@ if generate_plot_SSH
     end
     
     %--------------------- SSH difference ----------------------------------------
-    f2=figure;
+    if N_baselines > 1
+        f2=figure;
 
-    legend_text={''};
-    text_in_textbox={''};
+        legend_text={''};
+        text_in_textbox={''};
 
-    for b=1:size(index_baseline_compare,1) 
-        b1=index_baseline_compare(b,1);
-        b2=index_baseline_compare(b,2);
-        
-        bias_compensation=0.0;%nanmean(SSH(b,:))-12.0;
-                
-        plot(lat_surf{b1},SSH{b1}-SSH{b2},'Marker',char(marker_bs(b)),'Color',color_bs(b,:),'LineStyle',cnf_tool.LineStyle, 'MarkerSize', cnf_tool.default_markersize);
-        hold on;
-        legend_text=[legend_text,strcat(sprintf('%s vs %s', char(name_bs(b1)), char(name_bs(b2))))];
-        text_in_textbox=[text_in_textbox, sprintf('%s vs %s:', char(name_bs(b1)), char(name_bs(b2))), sprintf('mean = %.4g [m]\nstd = %.4g [m]', ...
-            nanmean(SSH_mean{b1}-SSH_mean{b2}), nanstd(SSH_mean{b1}-SSH_mean{b2}))];
-        if b ~= size(index_baseline_compare,1) 
-           text_in_textbox = [text_in_textbox, sprintf('\n')]; 
+        for b=1:size(index_baseline_compare,1) 
+            b1=index_baseline_compare(b,1);
+            b2=index_baseline_compare(b,2);
+
+            bias_compensation=0.0;%nanmean(SSH(b,:))-12.0;
+
+            plot(lat_surf{b1},SSH{b1}-SSH{b2},'Marker',char(marker_bs(b)),'Color',color_bs(b,:),'LineStyle',cnf_tool.LineStyle, 'MarkerSize', cnf_tool.default_markersize);
+            hold on;
+            legend_text=[legend_text,strcat(sprintf('%s vs %s', char(name_bs(b1)), char(name_bs(b2))))];
+            text_in_textbox=[text_in_textbox, sprintf('%s vs %s:', char(name_bs(b1)), char(name_bs(b2))), sprintf('mean = %.4g [m]\nstd = %.4g [m]', ...
+                nanmean(SSH_mean{b1}-SSH_mean{b2}), nanstd(SSH_mean{b1}-SSH_mean{b2}))];
+            if b ~= size(index_baseline_compare,1) 
+               text_in_textbox = [text_in_textbox, sprintf('\n')]; 
+            end
         end
-    end
-    title(strjoin(text_title), 'Interpreter',text_interpreter);
-    leg=legend(legend_text(~cellfun(@isempty,legend_text)),'Location','northeastoutside','Fontsize',cnf_tool.legend_fontsize);
-    pos_leg=get(leg,'Position');
-    xlabel('Latitude [deg.]','Interpreter',text_interpreter); ylabel(strcat('SSH difference',' [m]'),'Interpreter',text_interpreter);
-    text_in_textbox=text_in_textbox(~cellfun(@isempty,text_in_textbox));
+        title(strjoin(text_title), 'Interpreter',text_interpreter);
+        leg=legend(legend_text(~cellfun(@isempty,legend_text)),'Location','northeastoutside','Fontsize',cnf_tool.legend_fontsize);
+        pos_leg=get(leg,'Position');
+        xlabel('Latitude [deg.]','Interpreter',text_interpreter); ylabel(strcat('SSH difference',' [m]'),'Interpreter',text_interpreter);
+        text_in_textbox=text_in_textbox(~cellfun(@isempty,text_in_textbox));
 
-    if annotation_box_active
-        annotation('textbox',[pos_leg(1),pos_leg(2)-3*pos_leg(4),pos_leg(3),pos_leg(4)],'String',text_in_textbox,...
-            'FitBoxToText','on','FontSize',cnf_tool.textbox_fontsize, 'Interpreter',text_interpreter);
-    end
-    ax=gca;
-    ax.XTickMode = 'manual';
-    ax.YTickMode = 'manual';
-    ax.ZTickMode = 'manual';
-    ax.XLimMode = 'manual';
-    ax.YLimMode = 'manual';
-    ax.ZLimMode = 'manual'; 
+        if annotation_box_active
+            annotation('textbox',[pos_leg(1),pos_leg(2)-3*pos_leg(4),pos_leg(3),pos_leg(4)],'String',text_in_textbox,...
+                'FitBoxToText','on','FontSize',cnf_tool.textbox_fontsize, 'Interpreter',text_interpreter);
+        end
+        ax=gca;
+        ax.XTickMode = 'manual';
+        ax.YTickMode = 'manual';
+        ax.ZTickMode = 'manual';
+        ax.XLimMode = 'manual';
+        ax.YLimMode = 'manual';
+        ax.ZLimMode = 'manual'; 
 
-    addlogoisardSAT('plot');
+        addlogoisardSAT('plot');
 
-    print(print_file,cnf_tool.res_fig,[path_comparison_results,file_id,'_differenceSSH', file_ext]); % figure_format
-    if cnf_tool.save_figure_format_fig
-       savefig([path_comparison_results,file_id,'_differenceSSH', '.fig']) 
+        print(print_file,cnf_tool.res_fig,[path_comparison_results,file_id,'_differenceSSH', file_ext]); % figure_format
+        if cnf_tool.save_figure_format_fig
+           savefig([path_comparison_results,file_id,'_differenceSSH', '.fig']) 
+        end
+        close(f2)
     end
     close(f1)
-    close(f2)
-    
 end
 
 if generate_plot_SWH
@@ -429,50 +440,52 @@ if generate_plot_SWH
     end
     
     %--------------- SWH difference --------------------------------------------
-    f2=figure;
-    legend_text={''};
-    text_in_textbox={''};
+    if N_baselines > 1
+        f2=figure;
+        legend_text={''};
+        text_in_textbox={''};
 
-    for b=1:size(index_baseline_compare,1) 
-        b1=index_baseline_compare(b,1);
-        b2=index_baseline_compare(b,2);
-        
-        bias_compensation=0.0;%nanmean(SSH(b,:))-12.0;
-                
-        plot(lat_surf{b1},SWH{b1}-SWH{b2},'Marker',char(marker_bs(b)),'Color',color_bs(b,:),'LineStyle',cnf_tool.LineStyle, 'MarkerSize', cnf_tool.default_markersize);
-        hold on;
-        legend_text=[legend_text,sprintf('%s vs %s', char(name_bs(b1)), char(name_bs(b2)))];
-        text_in_textbox=[text_in_textbox, sprintf('%s vs %s:', char(name_bs(b1)), char(name_bs(b2))), sprintf('mean = %.4g [m]\nstd = %.4g [m]', ...
-            nanmean(SWH_mean{b1}-SWH_mean{b2}), nanstd(SWH_mean{b1}-SWH_mean{b2}))];
-        if b ~= size(index_baseline_compare,1) 
-           text_in_textbox = [text_in_textbox, sprintf('\n')]; 
+        for b=1:size(index_baseline_compare,1) 
+            b1=index_baseline_compare(b,1);
+            b2=index_baseline_compare(b,2);
+
+            bias_compensation=0.0;%nanmean(SSH(b,:))-12.0;
+
+            plot(lat_surf{b1},SWH{b1}-SWH{b2},'Marker',char(marker_bs(b)),'Color',color_bs(b,:),'LineStyle',cnf_tool.LineStyle, 'MarkerSize', cnf_tool.default_markersize);
+            hold on;
+            legend_text=[legend_text,sprintf('%s vs %s', char(name_bs(b1)), char(name_bs(b2)))];
+            text_in_textbox=[text_in_textbox, sprintf('%s vs %s:', char(name_bs(b1)), char(name_bs(b2))), sprintf('mean = %.4g [m]\nstd = %.4g [m]', ...
+                nanmean(SWH_mean{b1}-SWH_mean{b2}), nanstd(SWH_mean{b1}-SWH_mean{b2}))];
+            if b ~= size(index_baseline_compare,1) 
+               text_in_textbox = [text_in_textbox, sprintf('\n')]; 
+            end
         end
-    end
-    title(strjoin(text_title), 'Interpreter',text_interpreter);
-    leg=legend(legend_text(~cellfun(@isempty,legend_text)),'Location','northeastoutside','Fontsize',cnf_tool.legend_fontsize);
-    pos_leg=get(leg,'Position');
+        title(strjoin(text_title), 'Interpreter',text_interpreter);
+        leg=legend(legend_text(~cellfun(@isempty,legend_text)),'Location','northeastoutside','Fontsize',cnf_tool.legend_fontsize);
+        pos_leg=get(leg,'Position');
 
-    xlabel('Latitude [deg.]','Interpreter',text_interpreter); ylabel('SWH difference [m]','Interpreter',text_interpreter);
-    text_in_textbox=text_in_textbox(~cellfun(@isempty,text_in_textbox));
-    if annotation_box_active
-        annotation('textbox',[pos_leg(1),pos_leg(2)-3*pos_leg(4),pos_leg(3),pos_leg(4)],'String',text_in_textbox,...
-            'FitBoxToText','on','FontSize',cnf_tool.textbox_fontsize, 'Interpreter',text_interpreter);
+        xlabel('Latitude [deg.]','Interpreter',text_interpreter); ylabel('SWH difference [m]','Interpreter',text_interpreter);
+        text_in_textbox=text_in_textbox(~cellfun(@isempty,text_in_textbox));
+        if annotation_box_active
+            annotation('textbox',[pos_leg(1),pos_leg(2)-3*pos_leg(4),pos_leg(3),pos_leg(4)],'String',text_in_textbox,...
+                'FitBoxToText','on','FontSize',cnf_tool.textbox_fontsize, 'Interpreter',text_interpreter);
+        end
+        ax=gca;
+        ax.XTickMode = 'manual';
+        ax.YTickMode = 'manual';
+        ax.ZTickMode = 'manual';
+        ax.XLimMode = 'manual';
+        ax.YLimMode = 'manual';
+        ax.ZLimMode = 'manual';
+
+        addlogoisardSAT('plot');
+
+        print(print_file,cnf_tool.res_fig,[path_comparison_results,file_id,'_differenceSWH', file_ext]); % figure_format
+        if cnf_tool.save_figure_format_fig
+           savefig([path_comparison_results,file_id,'_differenceSWH', '.fig']) 
+        end
+        close(f2);
     end
-    ax=gca;
-    ax.XTickMode = 'manual';
-    ax.YTickMode = 'manual';
-    ax.ZTickMode = 'manual';
-    ax.XLimMode = 'manual';
-    ax.YLimMode = 'manual';
-    ax.ZLimMode = 'manual';
-    
-    addlogoisardSAT('plot');
-    
-    print(print_file,cnf_tool.res_fig,[path_comparison_results,file_id,'_differenceSWH', file_ext]); % figure_format
-    if cnf_tool.save_figure_format_fig
-       savefig([path_comparison_results,file_id,'_differenceSWH', '.fig']) 
-    end
-    close(f2);
     close(f1);
 end
 
@@ -527,57 +540,58 @@ if generate_plot_sigma0
     end
     
     %--------------------- sigma0 difference ------------------------------------
-    f2=figure;
-    legend_text={''};
-    text_in_textbox={''};
+    if N_baselines > 1
+        f2=figure;
+        legend_text={''};
+        text_in_textbox={''};
 
-    for b=1:size(index_baseline_compare,1) 
-        b1=index_baseline_compare(b,1);
-        b2=index_baseline_compare(b,2);
-        
-        bias_compensation=0.0;%nanmean(SSH(b,:))-12.0;
-                
-        plot(lat_surf{b1},sigma0{b1}-sigma0{b2},'Marker',char(marker_bs(b)),'Color',color_bs(b,:),'LineStyle',cnf_tool.LineStyle, 'MarkerSize', cnf_tool.default_markersize);
-        hold on;
-        legend_text=[legend_text,sprintf('%s vs %s', char(name_bs(b1)), char(name_bs(b2)))];
-        text_in_textbox=[text_in_textbox, sprintf('%s vs %s:', char(name_bs(b1)), char(name_bs(b2))), sprintf('Mean = %.4g [dB]\nstd = %.4g [dB]', ...
-            nanmean(SWH_mean{b1}-SWH_mean{b2}), nanstd(SWH_mean{b1}-SWH_mean{b2}))];
-        if b ~= size(index_baseline_compare,1) 
-           text_in_textbox = [text_in_textbox, sprintf('\n')]; 
+        for b=1:size(index_baseline_compare,1) 
+            b1=index_baseline_compare(b,1);
+            b2=index_baseline_compare(b,2);
+
+            bias_compensation=0.0;%nanmean(SSH(b,:))-12.0;
+
+            plot(lat_surf{b1},sigma0{b1}-sigma0{b2},'Marker',char(marker_bs(b)),'Color',color_bs(b,:),'LineStyle',cnf_tool.LineStyle, 'MarkerSize', cnf_tool.default_markersize);
+            hold on;
+            legend_text=[legend_text,sprintf('%s vs %s', char(name_bs(b1)), char(name_bs(b2)))];
+            text_in_textbox=[text_in_textbox, sprintf('%s vs %s:', char(name_bs(b1)), char(name_bs(b2))), sprintf('Mean = %.4g [dB]\nstd = %.4g [dB]', ...
+                nanmean(SWH_mean{b1}-SWH_mean{b2}), nanstd(SWH_mean{b1}-SWH_mean{b2}))];
+            if b ~= size(index_baseline_compare,1) 
+               text_in_textbox = [text_in_textbox, sprintf('\n')]; 
+            end
         end
-    end
-    title(strjoin(text_title), 'Interpreter',text_interpreter);
-    leg=legend(legend_text(~cellfun(@isempty,legend_text)),'Location','northeastoutside','Fontsize',cnf_tool.legend_fontsize);
-    pos_leg=get(leg,'Position');
+        title(strjoin(text_title), 'Interpreter',text_interpreter);
+        leg=legend(legend_text(~cellfun(@isempty,legend_text)),'Location','northeastoutside','Fontsize',cnf_tool.legend_fontsize);
+        pos_leg=get(leg,'Position');
 
-    xlabel('Latitude [deg.]','Interpreter',text_interpreter); 
-    if strcmp(text_interpreter, 'latex')
-        ylabel('$\sigma^0$ difference [dB]','Interpreter',text_interpreter);
-    else
-         ylabel('\sigma^0 difference [dB]','Interpreter',text_interpreter);
-    end
-    text_in_textbox=text_in_textbox(~cellfun(@isempty,text_in_textbox));
+        xlabel('Latitude [deg.]','Interpreter',text_interpreter); 
+        if strcmp(text_interpreter, 'latex')
+            ylabel('$\sigma^0$ difference [dB]','Interpreter',text_interpreter);
+        else
+             ylabel('\sigma^0 difference [dB]','Interpreter',text_interpreter);
+        end
+        text_in_textbox=text_in_textbox(~cellfun(@isempty,text_in_textbox));
 
-    if annotation_box_active
-       annotation('textbox',[pos_leg(1),pos_leg(2)-3*pos_leg(4),pos_leg(3),pos_leg(4)],'String',text_in_textbox,'FitBoxToText','on','FontSize',cnf_tool.textbox_fontsize, 'Interpreter',text_interpreter);
+        if annotation_box_active
+           annotation('textbox',[pos_leg(1),pos_leg(2)-3*pos_leg(4),pos_leg(3),pos_leg(4)],'String',text_in_textbox,'FitBoxToText','on','FontSize',cnf_tool.textbox_fontsize, 'Interpreter',text_interpreter);
+        end
+        ax=gca;
+        ax.XTickMode = 'manual';
+        ax.YTickMode = 'manual';
+        ax.ZTickMode = 'manual';
+        ax.XLimMode = 'manual';
+        ax.YLimMode = 'manual';
+        ax.ZLimMode = 'manual';
+
+        addlogoisardSAT('plot');
+
+        print(print_file,cnf_tool.res_fig,[path_comparison_results,file_id,'_differencesigma0', file_ext]); % figure_format
+        if cnf_tool.save_figure_format_fig
+            savefig([path_comparison_results,file_id,'_differencesigma0', '.fig']) 
+        end    
+        close(f2)
     end
-    ax=gca;
-    ax.XTickMode = 'manual';
-    ax.YTickMode = 'manual';
-    ax.ZTickMode = 'manual';
-    ax.XLimMode = 'manual';
-    ax.YLimMode = 'manual';
-    ax.ZLimMode = 'manual';
-    
-    addlogoisardSAT('plot');
-    
-    print(print_file,cnf_tool.res_fig,[path_comparison_results,file_id,'_differencesigma0', file_ext]); % figure_format
-    if cnf_tool.save_figure_format_fig
-        savefig([path_comparison_results,file_id,'_differencesigma0', '.fig']) 
-    end
-    
     close(f1)
-    close(f2)
 end
 
 if generate_plot_COR && ~any(ismember(cnf_tool.L2proc,'GPP'))
@@ -625,51 +639,53 @@ if generate_plot_COR && ~any(ismember(cnf_tool.L2proc,'GPP'))
     end
     
     %--------------------- COR difference --------------------------------
-    f2=figure;
-    legend_text={''};
-    text_in_textbox={''};
-    
-    for b=1:size(index_baseline_compare,1) 
-        b1=index_baseline_compare(b,1);
-        b2=index_baseline_compare(b,2);
-        
-        bias_compensation=0.0;%nanmean(SSH(b,:))-12.0;
-                
-        plot(lat_surf{b1},COR{b1}-COR{b2},'Marker',char(marker_bs(b)),'Color',color_bs(b,:),'LineStyle',cnf_tool.LineStyle, 'MarkerSize', cnf_tool.default_markersize);
-        hold on;
-        legend_text=[legend_text,sprintf('%s vs %s', char(name_bs(b1)), char(name_bs(b2)))];
-        text_in_textbox=[text_in_textbox, sprintf('%s vs %s:', char(name_bs(b1)), char(name_bs(b2))), strcat(sprintf('Mean = %.4g', ...
-            nanmean(COR_mean{b1}-COR_mean{b2})), percent, sprintf('\nstd = %.4g', ...
-            nanstd(COR_mean{b1}-COR_mean{b2})), percent)];
-        if b ~= size(index_baseline_compare,1) 
-           text_in_textbox = [text_in_textbox, sprintf('\n')]; 
-        end
-    end
-    title(strjoin(text_title), 'Interpreter',text_interpreter);
-    leg=legend(legend_text(~cellfun(@isempty,legend_text)),'Location','northeastoutside','Fontsize',cnf_tool.legend_fontsize);
-    pos_leg=get(leg,'Position');
-%     ylim([99,100]);
+    if N_baselines > 1
+        f2=figure;
+        legend_text={''};
+        text_in_textbox={''};
 
-    xlabel('Latitude [deg.]','Interpreter',text_interpreter); 
-    if strcmp(text_interpreter, 'latex')
-        ylabel('$\rho$ difference [\%]','Interpreter',text_interpreter);
-    else
-        ylabel('\rho difference [%]','Interpreter',text_interpreter);
+        for b=1:size(index_baseline_compare,1) 
+            b1=index_baseline_compare(b,1);
+            b2=index_baseline_compare(b,2);
+
+            bias_compensation=0.0;%nanmean(SSH(b,:))-12.0;
+
+            plot(lat_surf{b1},COR{b1}-COR{b2},'Marker',char(marker_bs(b)),'Color',color_bs(b,:),'LineStyle',cnf_tool.LineStyle, 'MarkerSize', cnf_tool.default_markersize);
+            hold on;
+            legend_text=[legend_text,sprintf('%s vs %s', char(name_bs(b1)), char(name_bs(b2)))];
+            text_in_textbox=[text_in_textbox, sprintf('%s vs %s:', char(name_bs(b1)), char(name_bs(b2))), strcat(sprintf('Mean = %.4g', ...
+                nanmean(COR_mean{b1}-COR_mean{b2})), percent, sprintf('\nstd = %.4g', ...
+                nanstd(COR_mean{b1}-COR_mean{b2})), percent)];
+            if b ~= size(index_baseline_compare,1) 
+               text_in_textbox = [text_in_textbox, sprintf('\n')]; 
+            end
+        end
+        title(strjoin(text_title), 'Interpreter',text_interpreter);
+        leg=legend(legend_text(~cellfun(@isempty,legend_text)),'Location','northeastoutside','Fontsize',cnf_tool.legend_fontsize);
+        pos_leg=get(leg,'Position');
+    %     ylim([99,100]);
+
+        xlabel('Latitude [deg.]','Interpreter',text_interpreter); 
+        if strcmp(text_interpreter, 'latex')
+            ylabel('$\rho$ difference [\%]','Interpreter',text_interpreter);
+        else
+            ylabel('\rho difference [%]','Interpreter',text_interpreter);
+        end
+        text_in_textbox=text_in_textbox(~cellfun(@isempty,text_in_textbox));
+        if annotation_box_active
+            annotation('textbox',[pos_leg(1),pos_leg(2)-3*pos_leg(4),pos_leg(3),pos_leg(4)],'String',text_in_textbox,'FitBoxToText','on','FontSize',cnf_tool.textbox_fontsize, 'Interpreter',text_interpreter);
+        end
+
+        addlogoisardSAT('plot');
+
+        print(print_file,cnf_tool.res_fig,[path_comparison_results,file_id,'_differenceCOR', file_ext]); % figure_format
+        if cnf_tool.save_figure_format_fig
+            savefig([path_comparison_results,file_id,'_COR', '.fig']) 
+        end
+
+        close(f2);
     end
-    text_in_textbox=text_in_textbox(~cellfun(@isempty,text_in_textbox));
-    if annotation_box_active
-        annotation('textbox',[pos_leg(1),pos_leg(2)-3*pos_leg(4),pos_leg(3),pos_leg(4)],'String',text_in_textbox,'FitBoxToText','on','FontSize',cnf_tool.textbox_fontsize, 'Interpreter',text_interpreter);
-    end
-    
-    addlogoisardSAT('plot');
-    
-    print(print_file,cnf_tool.res_fig,[path_comparison_results,file_id,'_differenceCOR', file_ext]); % figure_format
-    if cnf_tool.save_figure_format_fig
-        savefig([path_comparison_results,file_id,'_COR', '.fig']) 
-    end
-    
     close(f1);
-    close(f2);
 end
 
 % save(strcat(path_comparison_results,file_id,'_Perf_',strjoin(strrep(strrep(name_bs,' ','_'),'-','_'),'_vs_')));

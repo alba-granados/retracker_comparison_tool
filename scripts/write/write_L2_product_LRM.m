@@ -56,7 +56,7 @@ switch cnf_p.output_product_format
         % .mat file
         save([file.resultPath 'data' filesep name_L2_product '.mat'],'out');        
     case 'nc'  % NetCDF output product
-        prepare_NetCDF_L2_LR([file.resultPath 'data' filesep name_L2_product '.nc'],out,cnf_p,cst_p); %can have a switch to define the variables if mission is S3 or S6
+        prepare_NetCDF_L2_LRM([file.resultPath 'data' filesep name_L2_product '.nc'],out,cnf_p,cst_p); %can have a switch to define the variables if mission is S3 or S6
 end
 
 

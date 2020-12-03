@@ -34,7 +34,7 @@ function [cnf_p]=read_CNF_tooloptions(cnf_file)
     cnf_p.visible_figures = struct.visible_figures.value;
     
     cnf_p.num_pools = struct.num_pools.value;
-    cnf_p.discard_records_begin = struct.discard_records_begin;    
+    cnf_p.discard_records_begin = struct.discard_records_begin.value;    
     % retrieved parameters performance analysis
     cnf_p.LineStyle=struct.LineStyle.value;
     cnf_p.marker_bs=struct.marker_bs.value;

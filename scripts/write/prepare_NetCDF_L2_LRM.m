@@ -243,7 +243,8 @@ netcdf.putAtt(ncid,id_aux,'mission_name',cnf_p.mission);
 netcdf.putAtt(ncid,id_aux,'operation_mode',cnf_p.mode);
 if isfield(out,'GLOBAL_ATT')
     switch cnf_p.mission
-        case {'S3','S3A','S3B','S6'}
+%         case {'S3','S3A','S3B','S6'}
+        case {'S6'}
             netcdf.putAtt(ncid,id_aux,'altimeter_sensor_name',out.GLOBAL_ATT.DATA_FILE_INFO.altimeter_sensor_name);
             netcdf.putAtt(ncid,id_aux,'gnss_sensor_name',out.GLOBAL_ATT.DATA_FILE_INFO.gnss_sensor_name);
             netcdf.putAtt(ncid,id_aux,'doris_sensor_name',out.GLOBAL_ATT.DATA_FILE_INFO.doris_sensor_name);
@@ -261,6 +262,11 @@ if isfield(out,'GLOBAL_ATT')
             netcdf.putAtt(ncid,id_aux,'xref_altimeter_characterisation',out.GLOBAL_ATT.DATA_FILE_INFO.xref_altimeter_characterisation);
             netcdf.putAtt(ncid,id_aux,'semi_major_ellipsoid_axis',out.GLOBAL_ATT.DATA_FILE_INFO.semi_major_ellipsoid_axis);
             netcdf.putAtt(ncid,id_aux,'ellipsoid_flattening',out.GLOBAL_ATT.DATA_FILE_INFO.ellipsoid_flattening);
+ 
+            netcdf.putAtt(ncid,id_aux,'pass_number',out.GLOBAL_ATT.DATA_FILE_INFO.pass_number);
+            netcdf.putAtt(ncid,id_aux,'cycle_number',out.GLOBAL_ATT.DATA_FILE_INFO.cycle_number);
+        otherwise
+            fprintf('Mission not contemplated to prepare L2 output netCDF file.\n');
     end
  
 end

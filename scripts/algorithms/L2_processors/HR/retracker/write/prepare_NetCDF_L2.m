@@ -949,7 +949,7 @@ if isfield(out,'GLOBAL_ATT')
             netcdf.putAtt(ncid,id_aux,'Stop_Lat',out.GLOBAL_ATT.DATA_FILE_INFO.Stop_Lat);
             netcdf.putAtt(ncid,id_aux,'Stop_Long',out.GLOBAL_ATT.DATA_FILE_INFO.Stop_Long);
             
-        case {'S3','S3A','S3B','S6'}
+        case {'S3','S3A','S3B'}
             netcdf.putAtt(ncid,id_aux,'altimeter_sensor_name',out.GLOBAL_ATT.DATA_FILE_INFO.altimeter_sensor_name);
             netcdf.putAtt(ncid,id_aux,'gnss_sensor_name',out.GLOBAL_ATT.DATA_FILE_INFO.gnss_sensor_name);
             netcdf.putAtt(ncid,id_aux,'doris_sensor_name',out.GLOBAL_ATT.DATA_FILE_INFO.doris_sensor_name);
@@ -967,6 +967,24 @@ if isfield(out,'GLOBAL_ATT')
             netcdf.putAtt(ncid,id_aux,'xref_altimeter_characterisation',out.GLOBAL_ATT.DATA_FILE_INFO.xref_altimeter_characterisation);
             netcdf.putAtt(ncid,id_aux,'semi_major_ellipsoid_axis',out.GLOBAL_ATT.DATA_FILE_INFO.semi_major_ellipsoid_axis);
             netcdf.putAtt(ncid,id_aux,'ellipsoid_flattening',out.GLOBAL_ATT.DATA_FILE_INFO.ellipsoid_flattening);
+        case {'S6'}
+            netcdf.putAtt(ncid,id_aux,'altimeter_sensor_name',out.GLOBAL_ATT.DATA_FILE_INFO.altimeter_sensor_name);
+            netcdf.putAtt(ncid,id_aux,'gnss_sensor_name',out.GLOBAL_ATT.DATA_FILE_INFO.gnss_sensor_name);
+            netcdf.putAtt(ncid,id_aux,'doris_sensor_name',out.GLOBAL_ATT.DATA_FILE_INFO.doris_sensor_name);
+            netcdf.putAtt(ncid,id_aux,'acq_station_name',out.GLOBAL_ATT.DATA_FILE_INFO.acq_station_name);
+            %netcdf.putAtt(ncid,id_aux,'doris_sensor_name',acq_station_name);
+            netcdf.putAtt(ncid,id_aux,'first_meas_time',out.GLOBAL_ATT.DATA_FILE_INFO.first_meas_time);
+            netcdf.putAtt(ncid,id_aux,'last_meas_time',out.GLOBAL_ATT.DATA_FILE_INFO.last_meas_time);
+            netcdf.putAtt(ncid,id_aux,'xref_altimeter_level0',out.GLOBAL_ATT.DATA_FILE_INFO.xref_altimeter_level0);
+            netcdf.putAtt(ncid,id_aux,'xref_altimeter_level1b',out.GLOBAL_ATT.DATA_FILE_INFO.xref_altimeter_level1B);
+            netcdf.putAtt(ncid,id_aux,'xref_altimeter_orbit',out.GLOBAL_ATT.DATA_FILE_INFO.xref_altimeter_orbit);
+            netcdf.putAtt(ncid,id_aux,'xref_doris_USO',out.GLOBAL_ATT.DATA_FILE_INFO.xref_doris_USO);
+            netcdf.putAtt(ncid,id_aux,'xref_altimeter_ltm_sar_cal1',out.GLOBAL_ATT.DATA_FILE_INFO.xref_altimeter_ltm_sar_cal1);
+            netcdf.putAtt(ncid,id_aux,'xref_altimeter_ltm_ku_cal2',out.GLOBAL_ATT.DATA_FILE_INFO.xref_altimeter_ltm_ku_cal2);
+            netcdf.putAtt(ncid,id_aux,'xref_altimeter_ltm_c_cal2',out.GLOBAL_ATT.DATA_FILE_INFO.xref_altimeter_ltm_c_cal2);
+            netcdf.putAtt(ncid,id_aux,'xref_altimeter_characterisation',out.GLOBAL_ATT.DATA_FILE_INFO.xref_altimeter_characterisation);
+            netcdf.putAtt(ncid,id_aux,'cycle_number',out.GLOBAL_ATT.DATA_FILE_INFO.cycle_number);
+            netcdf.putAtt(ncid,id_aux,'pass_number',out.GLOBAL_ATT.DATA_FILE_INFO.pass_number);
     end
  
 end
