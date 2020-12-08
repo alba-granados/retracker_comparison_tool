@@ -67,7 +67,7 @@ end
 
 % Default path to configuration file
 cnf_waveformfittingtool_path  = strcat(pwd, filesep);    
-tool_bsln_id = 'S6_LX2_CL_HR.json';
+tool_bsln_id = 'S6_LX2_CL_RMCground.json';
 inputFiles      =   dir(cnf_waveformfittingtool_path);
 aux=struct2cell(inputFiles); aux=aux(1,:); %Keep the
 if ~isempty(tool_bsln_id)
@@ -374,6 +374,8 @@ for i_fileL2_input=1:filesBulk(1).nFilesL2
         fprintf('\nPlotting fitted power waveforms...\n');
 
         model_fit_to_power_waveform(filesBulk, name_bs, cnf_p, cst_p, chd_p, filename_L1, SWH, sigma0, epoch, Pu, COR, cnf_tool);
+%         model_fit_to_power_waveform_dynamic(filesBulk, name_bs, cnf_p, cst_p, chd_p, filename_L1, SWH, SSH, sigma0, epoch, Pu, COR, cnf_tool);
+
 %         end
 
         % ---------------- RUN RETRIEVED PARAMETERS COMPARISON ------------------
