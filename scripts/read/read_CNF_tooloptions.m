@@ -29,6 +29,7 @@ function [cnf_p]=read_CNF_tooloptions(cnf_file)
     cnf_p.default_fontname=struct.default_fontname.value;
     cnf_p.default_figuresize=struct.default_figuresize.value;
     cnf_p.default_linewidth=struct.default_linewidth.value;
+    cnf_p.default_linewidth_wfm=struct.default_linewidth_wfm.value;
     cnf_p.default_markersize=struct.default_markersize.value;
     cnf_p.save_figure_format_fig=struct.save_figure_format_fig.value;
     cnf_p.visible_figures = struct.visible_figures.value;
@@ -37,6 +38,7 @@ function [cnf_p]=read_CNF_tooloptions(cnf_file)
     cnf_p.discard_records_begin = struct.discard_records_begin.value;    
     % retrieved parameters performance analysis
     cnf_p.LineStyle=struct.LineStyle.value;
+    cnf_p.LineStyle_wfm=struct.LineStyle_wfm.value;
     cnf_p.marker_bs=struct.marker_bs.value;
     cnf_p.win_size_detrending=struct.win_size_detrending.value;
     cnf_p.flag_outliers_removal=struct.flag_outliers_removal.value;

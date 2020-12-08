@@ -1107,11 +1107,11 @@ end
             if cnf_p.plot_fits_flag && ((mod(m,cnf_p.plot_fits_downsampling)==0) || (m==1)) && (data.GEO.LAT(m)>=cnf_p.plot_fits_lat_range(1) && data.GEO.LAT(m)<=cnf_p.plot_fits_lat_range(2))
 
                 text_interpreter=get(0, 'defaultAxesTickLabelInterpreter'); %cnf_p.text_interpreter;
-                colors=[86/255, 180/255, 233/255; 230/255, 159/255, 0/255; 0/255, 158/255, 115/255; 213/255, 94/255, 0/255; 0/255, 114/255, 178/255; 204/255, 121/255, 167/255; 240/255, 228/255, 66/255; 0/255, 0/255, 0/255]; % colorblind palette for plots
-
+%                 colors=[86/255, 180/255, 233/255; 230/255, 159/255, 0/255; 0/255, 158/255, 115/255; 213/255, 94/255, 0/255; 0/255, 114/255, 178/255; 204/255, 121/255, 167/255; 240/255, 228/255, 66/255; 0/255, 0/255, 0/255]; % colorblind palette for plots
+colors=[20/255, 115/255, 175/255; 209/255, 96/255, 47/255;  229/255, 158/255, 55/255; 25/255, 158/255, 116/255; 204/255, 121/255, 167/255; 240/255, 228/255, 66/255; 0/255, 0/255, 0/255];
                 f1=figure;
                 plt=plot(1:data.N_samples,data.HRM.power_wav_filtered(m,:)/max(data.HRM.power_wav_filtered(m,:)),'Color', colors(1,:), 'LineStyle', '-');
-                plt.Color(4) = 0.3; % transparency
+                plt.Color(4) = 0.5; % transparency
                 hold on                
                 if (cnf_p.two_step_fitting) && COR_1st_iter<cnf_p.two_step_fitting_COR_threshold_rou/100
                     plot(start_sample:stop_sample,ml_wav_1st_iter,'--r'); %ocean-like
@@ -1155,7 +1155,7 @@ end
                         end
                         annotation('textbox', [pos_leg(1),pos_leg(2)-pos_leg(4)-0.15,pos_leg(3),0.1],...
                             'String',textbox_string,...
-                            'FitBoxToText','on',  'Interpreter',text_interpreter);
+                            'FitBoxToText','on',  'Interpreter',text_interpreter, 'LineWidth', 1);
                         type_fit='SWH';
                     end
                     

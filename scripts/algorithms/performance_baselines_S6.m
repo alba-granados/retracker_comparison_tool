@@ -142,6 +142,7 @@ for i_baseline=1:N_baselines
     switch cnf_tool.L2proc{i_baseline}
         case 'ISD'
             lat_surf{i_baseline} = double(ncread(filename_L2_ISR{i_baseline},'lat_20_ku')).';
+            lon_surf{i_baseline} = double(ncread(filename_L2_ISR{i_baseline},'lon_20_ku')).';
         case 'GPP'
             lat_surf{i_baseline} = double(ncread(filename_L2_ISR{i_baseline},'data_20/ku/latitude')).';
     end
@@ -149,6 +150,7 @@ for i_baseline=1:N_baselines
     lat_mask{i_baseline} = find(lat_surf{i_baseline}>cnf_tool.performance_latitude_range(1) & lat_surf{i_baseline}<cnf_tool.performance_latitude_range(2));    
 
     lat_surf{i_baseline} = lat_surf{i_baseline}(lat_mask{i_baseline});
+    lon_surf{i_baseline} = lon_surf{i_baseline}(lat_mask{i_baseline});
     SSH{i_baseline}=SSH{i_baseline}(lat_mask{i_baseline});
     SWH{i_baseline}=SWH{i_baseline}(lat_mask{i_baseline});
     sigma0{i_baseline}=sigma0{i_baseline}(lat_mask{i_baseline});
@@ -285,17 +287,18 @@ end
 
 [~,file_id,~]=fileparts(filename_L2_ISR{1});
 aux=strsplit(file_id, '_');
-text_title = aux(1:2);
+text_title = {aux{1}, 'L1', aux{2}};
 
-finfo = ncinfo(filename_L2_ISR{1});
-if any(ismember({finfo.Attributes.Name}, {'cycle_number'})) 
-    cycle_number = ncreadatt(filename_L2_ISR{1}, '/','cycle_number');
-    pass_number = ncreadatt(filename_L2_ISR{1}, '/','pass_number');
-    text_title = [text_title, sprintf(' - cycle %d pass %d', cycle_number, pass_number)]; 
-end
+% finfo = ncinfo(filename_L2_ISR{1});
+% if any(ismember({finfo.Attributes.Name}, {'cycle_number'})) 
+%     cycle_number = ncreadatt(filename_L2_ISR{1}, '/','cycle_number');
+%     pass_number = ncreadatt(filename_L2_ISR{1}, '/','pass_number');
+%     text_title = [text_title, sprintf(' - cycle %d pass %d', cycle_number, pass_number)]; 
+% end
 
 
 text_interpreter=get(0, 'defaultAxesTickLabelInterpreter'); %cnf_p.text_interpreter;
+plot_baseline = 1;
 
 if generate_plot_SSH 
     
@@ -305,11 +308,15 @@ if generate_plot_SSH
     legend_text={''};
     text_in_textbox={''};
 
+    plot_baseline = 1;
     for b=1:N_baselines
         bias_compensation=0.0;%nanmean(SSH(b,:))-12.0;
-                
-        plot(lat_surf{b},SSH{b}-bias_compensation,'Marker',char(marker_bs(b)),'Color',color_bs(b,:),'LineStyle',cnf_tool.LineStyle, 'MarkerSize', cnf_tool.default_markersize);
-        plt.Color(4) = 0.3; % transparency
+          
+        coef_width=1*0.6^(plot_baseline-1);
+        plot_baseline = plot_baseline + 1;
+        plt=plot(lat_surf{b},SSH{b}-bias_compensation,'Marker',char(marker_bs(b)),'Color',color_bs(b,:),...
+            'LineStyle',cnf_tool.LineStyle{b}, 'MarkerSize', cnf_tool.default_markersize, 'LineWidth', coef_width*cnf_tool.default_linewidth);
+        plt.Color(4) = 1; % transparency
         hold on;
         legend_text=[legend_text,name_bs(b)];
 %         text_in_textbox=[text_in_textbox, strcat(char(name_bs(b)), ':'), sprintf('RMSE = %.4g [m]\nstd = %.4g [m]\nBias = %.4g [m]', ...
@@ -320,15 +327,17 @@ if generate_plot_SSH
            text_in_textbox = [text_in_textbox, sprintf('\n')]; 
         end
     end
+    plot_baseline = 1;
     title(strjoin(text_title), 'Interpreter',text_interpreter);
     leg=legend(legend_text(~cellfun(@isempty,legend_text)),'Location','northeastoutside');
     pos_leg=get(leg,'Position');
     xlabel('Latitude [deg.]','Interpreter',text_interpreter); ylabel(strcat('SSH',' [m]'),'Interpreter',text_interpreter);
     text_in_textbox=text_in_textbox(~cellfun(@isempty,text_in_textbox));
-
+    xlim([min(lat_surf{1}), max(lat_surf{1})]);
     if annotation_box_active
-        annotation('textbox',[0.988*pos_leg(1),pos_leg(2)-1.5*pos_leg(4),pos_leg(3),pos_leg(4)],'String',text_in_textbox,...
+        h=annotation('textbox',[0.999*pos_leg(1),pos_leg(2)-1.4*pos_leg(4),pos_leg(3),pos_leg(4)],'String',text_in_textbox,...
             'FitBoxToText','on','FontSize',cnf_tool.textbox_fontsize, 'Interpreter',text_interpreter);
+        h.LineWidth = 0.5;
     end
     ax=gca;
     ax.XTickMode = 'manual';
@@ -339,6 +348,7 @@ if generate_plot_SSH
     ax.ZLimMode = 'manual'; 
 
     addlogoisardSAT('plot');
+%     addlogoESA('plot');
     
     print(print_file,cnf_tool.res_fig,[path_comparison_results,file_id,'_SSH', file_ext]); % figure_format
     if cnf_tool.save_figure_format_fig
@@ -346,6 +356,7 @@ if generate_plot_SSH
     end
     
     %--------------------- SSH difference ----------------------------------------
+
     if N_baselines > 1
         f2=figure;
 
@@ -358,7 +369,11 @@ if generate_plot_SSH
 
             bias_compensation=0.0;%nanmean(SSH(b,:))-12.0;
 
-            plot(lat_surf{b1},SSH{b1}-SSH{b2},'Marker',char(marker_bs(b)),'Color',color_bs(b,:),'LineStyle',cnf_tool.LineStyle, 'MarkerSize', cnf_tool.default_markersize);
+            coef_width=1*0.6^(plot_baseline-1);
+            plot_baseline = plot_baseline + 1;
+            
+            plt=plot(lat_surf{b1},SSH{b1}-SSH{b2},'Marker',char(marker_bs(b)),'Color',color_bs(b,:),...
+                'LineStyle',cnf_tool.LineStyle{b1}, 'MarkerSize', cnf_tool.default_markersize, 'LineWidth', coef_width*cnf_tool.default_linewidth);
             hold on;
             legend_text=[legend_text,strcat(sprintf('%s vs %s', char(name_bs(b1)), char(name_bs(b2))))];
             text_in_textbox=[text_in_textbox, sprintf('%s vs %s:', char(name_bs(b1)), char(name_bs(b2))), sprintf('mean = %.4g [m]\nstd = %.4g [m]', ...
@@ -367,15 +382,17 @@ if generate_plot_SSH
                text_in_textbox = [text_in_textbox, sprintf('\n')]; 
             end
         end
+        plot_baseline = 1;
         title(strjoin(text_title), 'Interpreter',text_interpreter);
         leg=legend(legend_text(~cellfun(@isempty,legend_text)),'Location','northeastoutside','Fontsize',cnf_tool.legend_fontsize);
         pos_leg=get(leg,'Position');
         xlabel('Latitude [deg.]','Interpreter',text_interpreter); ylabel(strcat('SSH difference',' [m]'),'Interpreter',text_interpreter);
         text_in_textbox=text_in_textbox(~cellfun(@isempty,text_in_textbox));
-
+        xlim([min(lat_surf{1}), max(lat_surf{1})]);
         if annotation_box_active
-            annotation('textbox',[pos_leg(1),pos_leg(2)-3*pos_leg(4),pos_leg(3),pos_leg(4)],'String',text_in_textbox,...
+            h=annotation('textbox',[pos_leg(1),pos_leg(2)-3*pos_leg(4),pos_leg(3),pos_leg(4)],'String',text_in_textbox,...
                 'FitBoxToText','on','FontSize',cnf_tool.textbox_fontsize, 'Interpreter',text_interpreter);
+            h.LineWidth = 0.5;
         end
         ax=gca;
         ax.XTickMode = 'manual';
@@ -394,6 +411,19 @@ if generate_plot_SSH
         close(f2)
     end
     close(f1)
+    
+%     % % map parameters value on a geographical map - see Pablo's plots
+%     f1=figure;
+%     axesm eckert4;
+%     framem; gridm;
+%     axis off
+%     scatterm(lat_dat, lon_dat, 30, res_P4_yaw, 'filled');
+%     geoshow('landareas.shp', 'FaceColor', 'none', 'EdgeColor', 'black');
+%     hcb = colorbar('southoutside');
+%     title(['My title bla bla bla']);
+%     set(get(hcb,'Xlabel'),'String','Yaw residual [deg]')
+%     addlogoisardSAT('map_attitude') (edited) 
+    
 end
 
 if generate_plot_SWH
@@ -403,7 +433,12 @@ if generate_plot_SWH
     text_in_textbox={''};
 
     for b=1:N_baselines
-        plot(lat_surf{b},SWH{b},'Marker',char(marker_bs(b)),'Color',color_bs(b,:),'LineStyle',cnf_tool.LineStyle, 'MarkerSize', cnf_tool.default_markersize);
+        
+        coef_width=1*0.6^(plot_baseline-1);
+        plot_baseline = plot_baseline + 1;
+        plt=plot(lat_surf{b},SWH{b},'Marker',char(marker_bs(b)),'Color',color_bs(b,:),'LineStyle',cnf_tool.LineStyle{b},...
+            'MarkerSize', cnf_tool.default_markersize, 'LineWidth', coef_width*cnf_tool.default_linewidth);
+        plt.Color(4) = 1; % transparency
         hold on;
         legend_text=[legend_text,name_bs(b)];
 %         text_in_textbox=[text_in_textbox, strcat(char(name_bs(b)), ':'), sprintf('RMSE = %.4g [m]\nstd = %.4g [m]\nBias = %.4g [m]',...
@@ -414,15 +449,18 @@ if generate_plot_SWH
            text_in_textbox = [text_in_textbox, sprintf('\n')]; 
         end
     end
+    plot_baseline = 1;
     title(strjoin(text_title), 'Interpreter',text_interpreter);
     leg=legend(legend_text(~cellfun(@isempty,legend_text)),'Location','northeastoutside','Fontsize',cnf_tool.legend_fontsize);
     pos_leg=get(leg,'Position');
 
     xlabel('Latitude [deg.]','Interpreter',text_interpreter); ylabel('SWH [m]','Interpreter',text_interpreter);
+    xlim([min(lat_surf{1}), max(lat_surf{1})]);
     text_in_textbox=text_in_textbox(~cellfun(@isempty,text_in_textbox));
     if annotation_box_active
-        annotation('textbox',[0.988*pos_leg(1),pos_leg(2)-1.5*pos_leg(4),pos_leg(3),pos_leg(4)],'String',text_in_textbox,...
+        h=annotation('textbox',[0.999*pos_leg(1),pos_leg(2)-1.4*pos_leg(4),pos_leg(3),pos_leg(4)],'String',text_in_textbox,...
             'FitBoxToText','on','FontSize',cnf_tool.textbox_fontsize, 'Interpreter',text_interpreter);
+        h.LineWidth = 0.5;
     end
     ax=gca;
     ax.XTickMode = 'manual';
@@ -450,8 +488,11 @@ if generate_plot_SWH
             b2=index_baseline_compare(b,2);
 
             bias_compensation=0.0;%nanmean(SSH(b,:))-12.0;
-
-            plot(lat_surf{b1},SWH{b1}-SWH{b2},'Marker',char(marker_bs(b)),'Color',color_bs(b,:),'LineStyle',cnf_tool.LineStyle, 'MarkerSize', cnf_tool.default_markersize);
+            coef_width=1*0.6^(plot_baseline-1);
+            plot_baseline = plot_baseline + 1;
+            plt=plot(lat_surf{b1},SWH{b1}-SWH{b2},'Marker',char(marker_bs(b)),'Color',color_bs(b,:),'LineStyle',cnf_tool.LineStyle{b1}, ...
+                'MarkerSize', cnf_tool.default_markersize, 'LineWidth', coef_width*cnf_tool.default_linewidth);
+                    plt.Color(4) = 1; % transparency
             hold on;
             legend_text=[legend_text,sprintf('%s vs %s', char(name_bs(b1)), char(name_bs(b2)))];
             text_in_textbox=[text_in_textbox, sprintf('%s vs %s:', char(name_bs(b1)), char(name_bs(b2))), sprintf('mean = %.4g [m]\nstd = %.4g [m]', ...
@@ -460,15 +501,17 @@ if generate_plot_SWH
                text_in_textbox = [text_in_textbox, sprintf('\n')]; 
             end
         end
+        plot_baseline = 1;
         title(strjoin(text_title), 'Interpreter',text_interpreter);
         leg=legend(legend_text(~cellfun(@isempty,legend_text)),'Location','northeastoutside','Fontsize',cnf_tool.legend_fontsize);
         pos_leg=get(leg,'Position');
-
+        xlim([min(lat_surf{1}), max(lat_surf{1})]);
         xlabel('Latitude [deg.]','Interpreter',text_interpreter); ylabel('SWH difference [m]','Interpreter',text_interpreter);
         text_in_textbox=text_in_textbox(~cellfun(@isempty,text_in_textbox));
         if annotation_box_active
-            annotation('textbox',[pos_leg(1),pos_leg(2)-3*pos_leg(4),pos_leg(3),pos_leg(4)],'String',text_in_textbox,...
+            h=annotation('textbox',[pos_leg(1),pos_leg(2)-3*pos_leg(4),pos_leg(3),pos_leg(4)],'String',text_in_textbox,...
                 'FitBoxToText','on','FontSize',cnf_tool.textbox_fontsize, 'Interpreter',text_interpreter);
+            h.LineWidth = 0.5;
         end
         ax=gca;
         ax.XTickMode = 'manual';
@@ -497,7 +540,11 @@ if generate_plot_sigma0
 
     for b=1:N_baselines
         bias_compensation=0.0;%mean(sigma0(b,:))-12.0;
-        plot(lat_surf{b},sigma0{b}-bias_compensation,'Marker',char(marker_bs(b)),'Color',color_bs(b,:),'LineStyle',cnf_tool.LineStyle, 'MarkerSize', cnf_tool.default_markersize);
+        coef_width=1*0.6^(plot_baseline-1);
+        plot_baseline = plot_baseline + 1;
+        plt=plot(lat_surf{b},sigma0{b}-bias_compensation,'Marker',char(marker_bs(b)),'Color',color_bs(b,:),...
+            'LineStyle',cnf_tool.LineStyle{b}, 'MarkerSize', cnf_tool.default_markersize, 'LineWidth', coef_width*cnf_tool.default_linewidth);
+                plt.Color(4) = 1; % transparency
         hold on;
         legend_text=[legend_text,name_bs(b)];
         text_in_textbox=[text_in_textbox, strcat(char(name_bs(b)), ':'), sprintf('RMSE = %.4g [dB]\nstd = %.4g [dB]\nMean = %.4g [dB]',...
@@ -509,10 +556,11 @@ if generate_plot_sigma0
         end
 
     end
+    plot_baseline = 1;
     title(strjoin(text_title), 'Interpreter',text_interpreter);
     leg=legend(legend_text(~cellfun(@isempty,legend_text)),'Location','northeastoutside','Fontsize',cnf_tool.legend_fontsize);
     pos_leg=get(leg,'Position');
-
+    xlim([min(lat_surf{1}), max(lat_surf{1})]);
     xlabel('Latitude [deg.]','Interpreter',text_interpreter); 
     if strcmp(text_interpreter, 'latex')
         ylabel('$\sigma^0$ [dB]','Interpreter',text_interpreter);    
@@ -522,7 +570,9 @@ if generate_plot_sigma0
     text_in_textbox=text_in_textbox(~cellfun(@isempty,text_in_textbox));
 
     if annotation_box_active
-       annotation('textbox',[0.988*pos_leg(1),pos_leg(2)-1.5*pos_leg(4),pos_leg(3),pos_leg(4)],'String',text_in_textbox,'FitBoxToText','on','FontSize',cnf_tool.textbox_fontsize, 'Interpreter',text_interpreter);
+       h=annotation('textbox',[0.999*pos_leg(1),pos_leg(2)-1.4*pos_leg(4),pos_leg(3),pos_leg(4)],'String',...
+           text_in_textbox,'FitBoxToText','on','FontSize',cnf_tool.textbox_fontsize, 'Interpreter',text_interpreter);
+        h.LineWidth = 0.5;
     end
     ax=gca;
     ax.XTickMode = 'manual';
@@ -550,8 +600,11 @@ if generate_plot_sigma0
             b2=index_baseline_compare(b,2);
 
             bias_compensation=0.0;%nanmean(SSH(b,:))-12.0;
-
-            plot(lat_surf{b1},sigma0{b1}-sigma0{b2},'Marker',char(marker_bs(b)),'Color',color_bs(b,:),'LineStyle',cnf_tool.LineStyle, 'MarkerSize', cnf_tool.default_markersize);
+            coef_width=1*0.6^(plot_baseline-1);
+            plot_baseline = plot_baseline + 1;
+            plt=plot(lat_surf{b1},sigma0{b1}-sigma0{b2},'Marker',char(marker_bs(b)),'Color',color_bs(b,:),...
+                'LineStyle',cnf_tool.LineStyle{b1}, 'MarkerSize', cnf_tool.default_markersize, 'LineWidth', coef_width*cnf_tool.default_linewidth);
+                    plt.Color(4) = 1; % transparency
             hold on;
             legend_text=[legend_text,sprintf('%s vs %s', char(name_bs(b1)), char(name_bs(b2)))];
             text_in_textbox=[text_in_textbox, sprintf('%s vs %s:', char(name_bs(b1)), char(name_bs(b2))), sprintf('Mean = %.4g [dB]\nstd = %.4g [dB]', ...
@@ -560,10 +613,11 @@ if generate_plot_sigma0
                text_in_textbox = [text_in_textbox, sprintf('\n')]; 
             end
         end
+        plot_baseline = 1;
         title(strjoin(text_title), 'Interpreter',text_interpreter);
         leg=legend(legend_text(~cellfun(@isempty,legend_text)),'Location','northeastoutside','Fontsize',cnf_tool.legend_fontsize);
         pos_leg=get(leg,'Position');
-
+        xlim([min(lat_surf{1}), max(lat_surf{1})]);
         xlabel('Latitude [deg.]','Interpreter',text_interpreter); 
         if strcmp(text_interpreter, 'latex')
             ylabel('$\sigma^0$ difference [dB]','Interpreter',text_interpreter);
@@ -573,7 +627,9 @@ if generate_plot_sigma0
         text_in_textbox=text_in_textbox(~cellfun(@isempty,text_in_textbox));
 
         if annotation_box_active
-           annotation('textbox',[pos_leg(1),pos_leg(2)-3*pos_leg(4),pos_leg(3),pos_leg(4)],'String',text_in_textbox,'FitBoxToText','on','FontSize',cnf_tool.textbox_fontsize, 'Interpreter',text_interpreter);
+           h=annotation('textbox',[pos_leg(1),pos_leg(2)-3*pos_leg(4),pos_leg(3),pos_leg(4)],'String',text_in_textbox,...
+               'FitBoxToText','on','FontSize',cnf_tool.textbox_fontsize, 'Interpreter',text_interpreter);
+            h.LineWidth = 0.5;
         end
         ax=gca;
         ax.XTickMode = 'manual';
@@ -606,7 +662,12 @@ if generate_plot_COR && ~any(ismember(cnf_tool.L2proc,'GPP'))
         percent = ' [%]';
     end
     for b=1:N_baselines
-        plot(lat_surf{b},COR{b},'Marker',char(marker_bs(b)),'Color',color_bs(b,:),'LineStyle',cnf_tool.LineStyle, 'MarkerSize', cnf_tool.default_markersize);
+        
+        coef_width=1*0.6^(plot_baseline-1);
+        plot_baseline = plot_baseline + 1;
+        plt=plot(lat_surf{b},COR{b},'Marker',char(marker_bs(b)),'Color',color_bs(b,:),'LineStyle',cnf_tool.LineStyle{b}, ...
+            'MarkerSize', cnf_tool.default_markersize, 'LineWidth', coef_width*cnf_tool.default_linewidth);
+                plt.Color(4) = 1; % transparency
         hold on;
         legend_text=[legend_text,name_bs(b)];
         text_in_textbox=[text_in_textbox, strcat(char(name_bs(b)), ':'), strcat(sprintf('RMSE = %.4g', COR_RMSE(b)), percent), ...
@@ -615,11 +676,12 @@ if generate_plot_COR && ~any(ismember(cnf_tool.L2proc,'GPP'))
            text_in_textbox = [text_in_textbox, sprintf('\n')]; 
         end
     end
+    plot_baseline = 1;
     title(strjoin(text_title), 'Interpreter',text_interpreter);
     leg=legend(legend_text(~cellfun(@isempty,legend_text)),'Location','northeastoutside','Fontsize',cnf_tool.legend_fontsize);
     pos_leg=get(leg,'Position');
     ylim([0.995*min([COR{:}]),min(100, 1.005*max([COR{:}]))]);
-
+    xlim([min(lat_surf{1}), max(lat_surf{1})]);
     xlabel('Latitude [deg.]','Interpreter',text_interpreter); 
     if strcmp(text_interpreter, 'latex')
         ylabel('$\rho$ [\%]','Interpreter',text_interpreter);
@@ -628,7 +690,9 @@ if generate_plot_COR && ~any(ismember(cnf_tool.L2proc,'GPP'))
     end
     text_in_textbox=text_in_textbox(~cellfun(@isempty,text_in_textbox));
     if annotation_box_active
-        annotation('textbox',[0.988*pos_leg(1),pos_leg(2)-1.5*pos_leg(4),pos_leg(3),pos_leg(4)],'String',text_in_textbox,'FitBoxToText','on','FontSize',cnf_tool.textbox_fontsize, 'Interpreter',text_interpreter);
+        h=annotation('textbox',[0.999*pos_leg(1),pos_leg(2)-1.4*pos_leg(4),pos_leg(3),pos_leg(4)],'String',text_in_textbox,...
+            'FitBoxToText','on','FontSize',cnf_tool.textbox_fontsize, 'Interpreter',text_interpreter);
+        h.LineWidth = 0.5;
     end
     
     addlogoisardSAT('plot');
@@ -649,8 +713,11 @@ if generate_plot_COR && ~any(ismember(cnf_tool.L2proc,'GPP'))
             b2=index_baseline_compare(b,2);
 
             bias_compensation=0.0;%nanmean(SSH(b,:))-12.0;
-
-            plot(lat_surf{b1},COR{b1}-COR{b2},'Marker',char(marker_bs(b)),'Color',color_bs(b,:),'LineStyle',cnf_tool.LineStyle, 'MarkerSize', cnf_tool.default_markersize);
+            coef_width=1*0.6^(plot_baseline-1);
+            plot_baseline = plot_baseline + 1;
+            plt=plot(lat_surf{b1},COR{b1}-COR{b2},'Marker',char(marker_bs(b)),'Color',color_bs(b,:),'LineStyle',cnf_tool.LineStyle{b1}, ...
+                'MarkerSize', cnf_tool.default_markersize, 'LineWidth', coef_width*cnf_tool.default_linewidth);
+                    plt.Color(4) = 1; % transparency
             hold on;
             legend_text=[legend_text,sprintf('%s vs %s', char(name_bs(b1)), char(name_bs(b2)))];
             text_in_textbox=[text_in_textbox, sprintf('%s vs %s:', char(name_bs(b1)), char(name_bs(b2))), strcat(sprintf('Mean = %.4g', ...
@@ -660,11 +727,12 @@ if generate_plot_COR && ~any(ismember(cnf_tool.L2proc,'GPP'))
                text_in_textbox = [text_in_textbox, sprintf('\n')]; 
             end
         end
+        plot_baseline = 1;
         title(strjoin(text_title), 'Interpreter',text_interpreter);
         leg=legend(legend_text(~cellfun(@isempty,legend_text)),'Location','northeastoutside','Fontsize',cnf_tool.legend_fontsize);
         pos_leg=get(leg,'Position');
     %     ylim([99,100]);
-
+        xlim([min(lat_surf{1}), max(lat_surf{1})]);
         xlabel('Latitude [deg.]','Interpreter',text_interpreter); 
         if strcmp(text_interpreter, 'latex')
             ylabel('$\rho$ difference [\%]','Interpreter',text_interpreter);
@@ -673,7 +741,9 @@ if generate_plot_COR && ~any(ismember(cnf_tool.L2proc,'GPP'))
         end
         text_in_textbox=text_in_textbox(~cellfun(@isempty,text_in_textbox));
         if annotation_box_active
-            annotation('textbox',[pos_leg(1),pos_leg(2)-3*pos_leg(4),pos_leg(3),pos_leg(4)],'String',text_in_textbox,'FitBoxToText','on','FontSize',cnf_tool.textbox_fontsize, 'Interpreter',text_interpreter);
+            h=annotation('textbox',[pos_leg(1),pos_leg(2)-3*pos_leg(4),pos_leg(3),pos_leg(4)],'String',text_in_textbox,...
+                'FitBoxToText','on','FontSize',cnf_tool.textbox_fontsize, 'Interpreter',text_interpreter);
+            h.LineWidth = 0.5;
         end
 
         addlogoisardSAT('plot');

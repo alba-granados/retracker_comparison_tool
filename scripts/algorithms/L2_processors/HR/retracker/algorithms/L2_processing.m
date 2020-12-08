@@ -123,11 +123,11 @@ exit_flag='';
 
 %% ------------------ Ploting formating -----------------------------------
 % set_default_plot;
-if cnf_p.visible_figures
-    set(0, 'DefaultFigureVisible', 'on');
-else
-    set(0, 'DefaultFigureVisible', 'off');
-end
+% if cnf_p.visible_figures
+%     set(0, 'DefaultFigureVisible', 'on');
+% else
+%     set(0, 'DefaultFigureVisible', 'off');
+% end
 
 %% ------------ Prepare/organize the input files definition ---------------
 %--------------------------------------------------------------------------
