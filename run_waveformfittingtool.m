@@ -67,7 +67,7 @@ end
 
 % Default path to configuration file
 cnf_waveformfittingtool_path  = strcat(pwd, filesep);    
-tool_bsln_id = 'S6_LX2_CL_RMCground.json';
+tool_bsln_id = 'S6_LX2_CL_HR_dl20.json';
 inputFiles      =   dir(cnf_waveformfittingtool_path);
 aux=struct2cell(inputFiles); aux=aux(1,:); %Keep the
 if ~isempty(tool_bsln_id)
