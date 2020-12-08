@@ -85,7 +85,7 @@
     },
 	"num_pools": {
         "description": "Flag to indicate the number of pools to be used in parallel computing",
-        "value": 1
+        "value": 3
     },
 	"discard_records_begin": {
         "description": "Only valid for LR fitting: Number of records at the beginning of track to be masked - fit parameters set to NaN",
