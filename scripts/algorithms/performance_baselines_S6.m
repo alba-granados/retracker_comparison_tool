@@ -544,7 +544,7 @@ if generate_plot_sigma0
         plot_baseline = plot_baseline + 1;
         plt=plot(lat_surf{b},sigma0{b}-bias_compensation,'Marker',char(marker_bs(b)),'Color',color_bs(b,:),...
             'LineStyle',cnf_tool.LineStyle{b}, 'MarkerSize', cnf_tool.default_markersize, 'LineWidth', coef_width*cnf_tool.default_linewidth);
-                plt.Color(4) = 1; % transparency
+        plt.Color(4) = 1; % transparency
         hold on;
         legend_text=[legend_text,name_bs(b)];
         text_in_textbox=[text_in_textbox, strcat(char(name_bs(b)), ':'), sprintf('RMSE = %.4g [dB]\nstd = %.4g [dB]\nMean = %.4g [dB]',...

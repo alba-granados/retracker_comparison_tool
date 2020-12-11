@@ -217,29 +217,7 @@ for m = 1:L2_num_surfaces
             end           
             
             plot_baseline = plot_baseline + 1;
-            fprintf('Plot surface #%s of baseline %d\n',num2str(m), i_baseline);
-            
-            if plot_baseline==1
-                ftrack=figure;
-                axesm eckert4;
-                framem; gridm;
-                axis off
-                worldmap('argentina')
-                geoshow('landareas.shp', 'FaceColor', 'none', 'EdgeColor', 'black');
-    %             scatterm(data{i_baseline}.GEO.LAT, data{i_baseline}.GEO.LON, 30, ones(1,length(data{i_baseline}.GEO.LAT)), 'filled');
-                scatterm(data{i_baseline}.GEO.LAT, data{i_baseline}.GEO.LON, 'marker','.','markerfacecolor','k'); %,'markersize',5);
-                scatterm(data{i_baseline}.GEO.LAT(m), data{i_baseline}.GEO.LON(m), 'marker','.','markerfacecolor','r'); %,'markersize',5);
-    %             hcb = colorbar('southoutside');
-    %             set(get(hcb,'Xlabel'),'String','SSH [m]')
-                print(print_file,cnf_tool.res_fig,[filesBulk(i_baseline).resultPath,file_id,'_maptrack',file_ext]);
-                close(ftrack);
-            end   
-            I = imread([filesBulk(i_baseline).resultPath,file_id,'_maptrack',file_ext]);
-                       imwrite(I, [filesBulk(i_baseline).resultPath,file_id,'_maptrack',file_ext]);
-            hold on;
-            ha2=axes('position',[.5, 0.5, .4, .4,]);   % plots
-            image(I)
-            set(ha2,'handlevisibility','off','visible','off')        
+            fprintf('Plot surface #%s of baseline %d\n',num2str(m), i_baseline);   
             
             if ~cnf_tool.overlay_baselines
                 if i_baseline==1 
@@ -490,9 +468,9 @@ for m = 1:L2_num_surfaces
                 else
                     title_text = [sprintf('wav. # %d (LAT: %.4g deg)', m, data{i_baseline}.GEO.LAT(m))];
                 end                
-%                 if isfield(data{i_baseline}.GLOBAL_ATT.DATA_FILE_INFO, 'cycle_number')
-%                     title_text = [title_text, sprintf(' - cycle %d pass %d', data{i_baseline}.GLOBAL_ATT.DATA_FILE_INFO.cycle_number, data{i_baseline}.GLOBAL_ATT.DATA_FILE_INFO.pass_number)]; 
-%                 end
+                if isfield(data{i_baseline}.GLOBAL_ATT.DATA_FILE_INFO, 'cycle_number')
+                    title_text = [title_text, sprintf(' - cycle %d pass %d', data{i_baseline}.GLOBAL_ATT.DATA_FILE_INFO.cycle_number, data{i_baseline}.GLOBAL_ATT.DATA_FILE_INFO.pass_number)]; 
+                end
                 title(title_text, 'Interpreter',text_interpreter); 
 
                 axis([1 data{i_baseline}.N_samples 0 1.0]);
@@ -527,13 +505,12 @@ for m = 1:L2_num_surfaces
             y1=get(gca,'ylim'); 
             plot([stop_sample stop_sample],y1, '--k', 'LineWidth',0.6);
             plot([start_sample start_sample],y1, '--k', 'LineWidth',0.6);
-%             legend_text={'RAW L1b-Waveform', 'RMC-onboard L1b-Waveform', 'RAW Model', 'RMC-onboard Model', 'Fitting range limit'};
             legend_text=[legend_text_meas, legend_text_anal, 'Fitting range limit'];
 
             h_leg=legend(legend_text(~cellfun(@isempty,legend_text)),'Location','northeastoutside','Fontsize',cnf_tool.legend_fontsize);
             pos_leg=get(h_leg,'Position');
             textbox_string=textbox_string(~cellfun(@isempty,textbox_string));
-            h=annotation('textbox', [pos_leg(1),pos_leg(2)-1.3*pos_leg(4),pos_leg(3),pos_leg(4)],...
+            h=annotation('textbox', [pos_leg(1),pos_leg(2)-1.2*pos_leg(4),pos_leg(3),pos_leg(4)],...
                 'String',textbox_string,...
                 'FitBoxToText','on',  'interpreter',text_interpreter, 'Fontsize', cnf_tool.textbox_fontsize);
             h.LineWidth = 0.5;
