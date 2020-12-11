@@ -361,10 +361,10 @@ for i_fileL1B_input=1:filesBulk.nFilesL1B
             
             f1 = figure;
             plt=plot(wfm_lrm_norm(:,m),'Color', colors(1,:), 'LineStyle', '-');
-            plt.Color(4) = 0.3; % transparency
+            plt.Color(4) = 0.6; % transparency
             hold on
             plot(wfm_init(m):wfm_last(m),sl_wfm, 'Color', colors(1,:), 'LineStyle', '-')
-            h_leg=legend('L1b-Waveform', 'Analytical fit','Location','northeastoutside');
+            h_leg=legend('L1b-Waveform', 'Model','Location','northeastoutside');
             pos_leg=get(h_leg,'Position'); 
             
             grid on
@@ -380,13 +380,14 @@ for i_fileL1B_input=1:filesBulk.nFilesL1B
                                     ['Pu = ', num2str(out.Pu(m),4), ' [dB]'], ['\rho = ', num2str(out.COR(m)*100,5), ' [%]'], ...
                                     ['\sigma^0 = ', num2str(out.Pu(m)+data.HRM.s0_sf(m)), ' [dB]'] };
             end
-            if isfield(data.GLOBAL_ATT.DATA_FILE_INFO, 'cycle_number')
-                title_text = [title_text, sprintf(' - cycle %d pass %d', data.GLOBAL_ATT.DATA_FILE_INFO.cycle_number, data.GLOBAL_ATT.DATA_FILE_INFO.pass_number)]; 
-            end
+%             if isfield(data.GLOBAL_ATT.DATA_FILE_INFO, 'cycle_number')
+%                 title_text = [title_text, sprintf(' - cycle %d pass %d', data.GLOBAL_ATT.DATA_FILE_INFO.cycle_number, data.GLOBAL_ATT.DATA_FILE_INFO.pass_number)]; 
+%             end
             title(title_text, 'Interpreter',cnf_tool.text_interpreter); 
-            annotation('textbox', [pos_leg(1),pos_leg(2)-pos_leg(4)-0.15,pos_leg(3),0.1],...
+            h=annotation('textbox', [pos_leg(1),pos_leg(2)-pos_leg(4)-0.15,pos_leg(3),0.1],...
                                 'String',textbox_string,...
-                                'FontSize',cnf_tool.default_fontsize,'FitBoxToText','on',  'Interpreter',cnf_tool.text_interpreter);
+                                'FontSize',cnf_tool.textbox_fontsize,'FitBoxToText','on',  'Interpreter',cnf_tool.text_interpreter);
+            h.LineWidth = 0.5;
             axis([1 size(wfm_lrm_norm,1) 0 1])
             
             addlogoisardSAT('plot');
