@@ -190,9 +190,14 @@ end
 
 % % compute filtered geophysical parameters estimates to plot them below
 % fitted curve
+% for ii=1:length(SSH) % bias first version S6
+%     SSH{ii} = SSH{ii} - 1.1;
+% end
+
 [lat_surf, lon_surf, SSH_filtered, SWH_filtered, sigma0_filtered, COR_filtered, SSH_RMSE, SWH_RMSE, sigma0_RMSE, COR_RMSE, SSH_std_mean, SWH_std_mean, sigma0_std_mean, COR_std_mean, ...
     SSH_mean, SWH_mean, sigma0_mean, COR_mean] = performance_baselines_S6_dynamic(SSH, SWH, sigma0, COR, filename_L1_ISR, ...
     [],name_bs, cnf_tool);
+
 
 
 %% ---------------- PLOTTING RESULTS -----------------------------------
@@ -208,7 +213,7 @@ end
 
 fprintf('Total # wvfms %d\n',L2_num_surfaces);
 
-for m = 1:L2_num_surfaces
+for m = 100:L2_num_surfaces
 
 	if ((mod(m,cnf_tool.plot_downsampling)==0) || (m==1)) 
 
@@ -233,22 +238,23 @@ for m = 1:L2_num_surfaces
                 framem; gridm;
                 axis off
                 worldmap('argentina')
-                geoshow('landareas.shp', 'FaceColor', 'none', 'EdgeColor', 'black');
-                scatterm(lat_surf{i_baseline}(1:m), lon_surf{i_baseline}(1:m), 200, SWH_filtered{i_baseline}(1:m), 'filled');
+                geoshow('landareas.shp', 'FaceColor', [191/255,	191/255,	191/255], 'EdgeColor', [10/255,	10/255,	10/255]);
+                scatterm(lat_surf{i_baseline}(1:400:m), lon_surf{i_baseline}(1:400:m), 600, [10/255,	10/255,	10/255],  'filled', '<');
 %                 scatterm(data{i_baseline}.GEO.LAT, data{i_baseline}.GEO.LON, 'marker','.','markerfacecolor','k'); %,'markersize',5);
 %                 scatterm(data{i_baseline}.GEO.LAT(m), data{i_baseline}.GEO.LON(m), 'marker','.','markerfacecolor','r'); %,'markersize',5);
     %             hcb = colorbar('southoutside');
     %             set(get(hcb,'Xlabel'),'String','SSH [m]')
                 print(print_file,cnf_tool.res_fig,[filesBulk(i_baseline).resultPath,file_id,'_maptrack',file_ext]);
                 close(ftrack);
-            end   
-            subplot(2,6,[1,2,3,4,5,6]);
-            I = imread([filesBulk(i_baseline).resultPath,file_id,'_maptrack',file_ext]);
-            hold on;
-            ha2=axes('position',[.437, 0.672, .25, .25,]);   % plots
-            image(I)
-            set(ha2,'handlevisibility','off','visible','off')        
+                subplot(5,3,[1,2,3, 4,5,6]);
+                I = imread([filesBulk(i_baseline).resultPath,file_id,'_maptrack',file_ext]);
+                hold on;
+                ha2=axes('position',[.437, 0.7, .25, .22,]);   % plots
+                image(I)
+                set(ha2,'handlevisibility','off','visible','off')   
+            end        
             
+            subplot(5,3,[1,2,3, 4,5,6]);
             if ~cnf_tool.overlay_baselines
                 if i_baseline==1 
                     close(f1); 
@@ -485,7 +491,7 @@ for m = 1:L2_num_surfaces
 
             if ~cnf_tool.overlay_baselines
                 legend_text={'L1b-Waveform', 'Analytical fit'};
-                h_leg=legend(legend_text(~cellfun(@isempty,legend_text)),'Location','northeastoutside','Fontsize',cnf_tool.legend_fontsize);
+                h_leg=legend(legend_text(~cellfun(@isempty,legend_text)),'Location','southeastoutside','Fontsize',cnf_tool.legend_fontsize);
                 pos_leg=get(h_leg,'Position');
 
                 y1=get(gca,'ylim'); 
@@ -538,8 +544,8 @@ for m = 1:L2_num_surfaces
             plot([start_sample start_sample],y1, '--k', 'LineWidth',0.6);
             legend_text=[legend_text_meas, legend_text_anal, 'Fitting range limit'];
 
-            h_leg=legend(legend_text(~cellfun(@isempty,legend_text)),'Location','northeastoutside','Fontsize',cnf_tool.legend_fontsize);
-            pos_leg=get(h_leg,'Position');
+            h_leg=legend(legend_text(~cellfun(@isempty,legend_text)),'Location','southeastoutside','Fontsize',cnf_tool.legend_fontsize);
+            pos_leg=get(h_leg,'Pos  ition');
             textbox_string=textbox_string(~cellfun(@isempty,textbox_string));
             xlabel('range bin',  'interpreter',text_interpreter);
             if indx_LR > 0
@@ -553,78 +559,135 @@ for m = 1:L2_num_surfaces
             else
                 title_text = [sprintf('HR waveform # %04d (LAT: %.02f deg)', m, data{baseline_HR}.GEO.LAT(m))];
             end                
-%             if isfield(data{baseline_HR}.GLOBAL_ATT.DATA_FILE_INFO, 'cycle_number')
-%                 title_text = [title_text, sprintf(' - cycle %d pass %d', data{baseline_HR}.GLOBAL_ATT.DATA_FILE_INFO.cycle_number, data{baseline_HR}.GLOBAL_ATT.DATA_FILE_INFO.pass_number)]; 
-%             end
             title(title_text, 'Interpreter',text_interpreter); 
             axis([1 data{baseline_HR}.N_samples 0 1.0]);
-  
-            addlogoisardSAT('plot');
-            
+              
             % % plot geophysical parameter estimate
-            % SWH
-            subplot(2,6,[7,8]);
-            text_in_textbox={''};
-            plot_baseline = 1;
-            for b=1:N_baselines
-                coef_width=1*0.6^(plot_baseline-1);
-                plot_baseline = plot_baseline + 1;
-                plt=plot(lat_surf{b}(1:m),SWH_filtered{b}(1:m),'Marker',cnf_tool.marker_bs{b},'Color',color_bs(b,:),...
-                    'LineStyle',cnf_tool.LineStyle{b}, 'MarkerSize', cnf_tool.default_markersize, 'LineWidth', coef_width*cnf_tool.default_linewidth);
-                plt.Color(4) = 1; % transparency
-                hold on;
-                legend_text=[legend_text,name_bs(b)];
-        %         text_in_textbox=[text_in_textbox, strcat(char(name_bs(b)), ':'), sprintf('RMSE = %.4g [m]\nstd = %.4g [m]\nBias = %.4g [m]', ...
-        %             SSH_RMSE(b), SSH_std_mean(b), nanmean(SSH_mean{b}-bias_compensation)-ref_SSH)];
-                text_in_textbox=[text_in_textbox, strcat(char(name_bs(b)), ':'), sprintf('RMSE = %.4g [m]\nstd = %.4g [m]\nmean = %.4g [m]', ...
-                    SWH_RMSE(b), SWH_std_mean(b), nanmean(SWH_mean{b}))];
-                if b ~= N_baselines
-                   text_in_textbox = [text_in_textbox, sprintf('\n')]; 
-                end
-            end
-            set(gca,'Xdir','reverse')
-            plot_baseline = 1;
-            xlabel('Latitude [deg.]','Interpreter',text_interpreter); ylabel(strcat('SWH',' [m]'),'Interpreter',text_interpreter);
-            text_in_textbox=text_in_textbox(~cellfun(@isempty,text_in_textbox));
-            xlim([min(data{baseline_HR}.GEO.LAT), max(data{baseline_HR}.GEO.LAT)]);
-            ylim([0, 5]);
-            h=annotation(gcf, 'textbox',[0.37,0,0.5,0.45],'String',text_in_textbox,...
-                'FitBoxToText','on','FontSize',cnf_tool.textbox_fontsize, 'Interpreter',text_interpreter);
-            h.LineWidth = 0.5;
+            lat_ini = lat_surf{baseline_HR}(1);
+            lat_end = lat_surf{baseline_HR}(m);
             
-            
-            % SSH
-            subplot(2,6,[10,11]);
+            % SSH           
+            ax=subplot(5,3,[7,10]);
+            ax.Position(2) = ax.Position(2)*0.8;
             legend_text={''};
-            text_in_textbox={''};
+            text_in_textbox=cell(N_baselines,1);
             plot_baseline = 1;
             for b=1:N_baselines
                 coef_width=1*0.6^(plot_baseline-1);
                 plot_baseline = plot_baseline + 1;
-                plt=plot(lat_surf{b}(1:m),SSH_filtered{b}(1:m),'Marker',cnf_tool.marker_bs{b},'Color',color_bs(b,:),...
+                mask = find(lat_surf{b}>=min(lat_ini,lat_end) & lat_surf{b}<=max(lat_ini,lat_end));
+                plt=plot(lat_surf{b}(mask),SSH_filtered{b}(mask),'Marker',cnf_tool.marker_bs{b},'Color',color_bs(b,:),...
                     'LineStyle',cnf_tool.LineStyle{b}, 'MarkerSize', cnf_tool.default_markersize, 'LineWidth', coef_width*cnf_tool.default_linewidth);
                 plt.Color(4) = 1; % transparency
                 hold on;
                 legend_text=[legend_text,name_bs(b)];
-        %         text_in_textbox=[text_in_textbox, strcat(char(name_bs(b)), ':'), sprintf('RMSE = %.4g [m]\nstd = %.4g [m]\nBias = %.4g [m]', ...
-        %             SSH_RMSE(b), SSH_std_mean(b), nanmean(SSH_mean{b}-bias_compensation)-ref_SSH)];
-                text_in_textbox=[text_in_textbox, strcat(char(name_bs(b)), ':'), sprintf('RMSE = %.4g [m]\nstd = %.4g [m]\nmean = %.4g [m]', ...
-                    SSH_RMSE(b), SSH_std_mean(b), nanmean(SSH_mean{b}))];
-                if b ~= N_baselines
-                   text_in_textbox = [text_in_textbox, sprintf('\n')]; 
+                if b==3
+                    spacing_x = strcat('%', string(23-length(char(name_bs(b)))-3*(b-1)), 's');
+                else
+                    spacing_x = strcat('%', string(23-length(char(name_bs(b)))), 's');
                 end
+                text_in_textbox{b}=[text_in_textbox{b}, strcat(char(name_bs(b)), ' [m]'), sprintf(char(spacing_x), ''), sprintf('%.4f%10s %.4f\n', ...
+                    SSH_std_mean(b), '', nanmean(SSH_mean{b}))];
+%                 if b ~= N_baselines
+%                    text_in_textbox = [text_in_textbox, sprintf('\n')]; 
+%                 end
             end
             set(gca,'Xdir','reverse')
             plot_baseline = 1;
             leg=legend(legend_text(~cellfun(@isempty,legend_text)),'Location','northeast');
             pos_leg=get(leg,'Position');
             xlabel('Latitude [deg.]','Interpreter',text_interpreter); ylabel(strcat('SSH',' [m]'),'Interpreter',text_interpreter);
-            text_in_textbox=text_in_textbox(~cellfun(@isempty,text_in_textbox));
             xlim([min(data{baseline_HR}.GEO.LAT), max(data{baseline_HR}.GEO.LAT)]);
-            ylim([0, max(SSH_filtered{1})+(5-mod(max(SSH_filtered{1}),5))]);
-            h=annotation(gcf, 'textbox',[0.78,0,0.5,0.45],'String',text_in_textbox,...
-                'FitBoxToText','on','FontSize',cnf_tool.textbox_fontsize, 'Interpreter',text_interpreter);
-            h.LineWidth = 0.5;
+            ylim([0, max(SSH_filtered{1})+(5-mod(max(SSH_filtered{1}),5))]);         
+
+            text_in_textbox=text_in_textbox(~cellfun(@isempty,text_in_textbox));
+            annotation(gcf, 'textbox',[0.12,0.14,0,0],'String',sprintf('%30s <\\sigma_{SSH,detr}> %3s <SSH>\n', '', ''),...
+                    'FitBoxToText','on','FontSize',cnf_tool.textbox_fontsize, 'Interpreter',text_interpreter, 'EdgeColor','none');
+            x_pos=0.04;
+            for b=1:N_baselines
+                h=annotation(gcf, 'textbox',[0.12,0.14-x_pos,0.0001,0.001],'String',text_in_textbox{b},...
+                    'FitBoxToText','on','FontSize',cnf_tool.textbox_fontsize, 'Interpreter',text_interpreter, 'EdgeColor','none');
+                x_pos = x_pos+0.03;
+            end
+            
+            
+            % SWH
+            ax=subplot(5,3,[8,11]);
+            ax.Position(2) = ax.Position(2)*0.8;
+            text_in_textbox=cell(N_baselines,1);
+            plot_baseline = 1;
+            for b=1:N_baselines
+                coef_width=1*0.6^(plot_baseline-1);
+                plot_baseline = plot_baseline + 1;
+                mask = find(lat_surf{b}>=min(lat_ini,lat_end) & lat_surf{b}<=max(lat_ini,lat_end));
+                plt=plot(lat_surf{b}(mask),SWH_filtered{b}(mask),'Marker',cnf_tool.marker_bs{b},'Color',color_bs(b,:),...
+                    'LineStyle',cnf_tool.LineStyle{b}, 'MarkerSize', cnf_tool.default_markersize, 'LineWidth', coef_width*cnf_tool.default_linewidth);
+                plt.Color(4) = 1; % transparency
+                hold on;
+                spacing_x = strcat('%', string(28-length(char(name_bs(b)))-4-7^(b-2)), 's');
+                text_in_textbox{b}=[text_in_textbox{b}, strcat(char(name_bs(b)), ' [m]'), sprintf(char(spacing_x), ''), sprintf('%.4f%8s %.4f\n', ...
+                    SWH_std_mean(b), '', nanmean(SWH_mean{b}))];
+%                 if b ~= N_baselines
+%                    text_in_textbox = [text_in_textbox, sprintf('\n')]; 
+%                 end
+            end
+            set(gca,'Xdir','reverse')
+            plot_baseline = 1;
+            xlabel('Latitude [deg.]','Interpreter',text_interpreter); ylabel(strcat('H_s',' [m]'),'Interpreter',text_interpreter);
+            xlim([min(data{baseline_HR}.GEO.LAT), max(data{baseline_HR}.GEO.LAT)]);
+            ylim([0, 5]);
+            
+            text_in_textbox=text_in_textbox(~cellfun(@isempty,text_in_textbox));
+            annotation(gcf, 'textbox',[0.4,0.14,0,0],'String',sprintf('%31s <\\sigma_{H_s,detr}> %5s <H_s>\n', '', ''),...
+                    'FitBoxToText','on','FontSize',cnf_tool.textbox_fontsize, 'Interpreter',text_interpreter, 'EdgeColor','none');
+            x_pos=0.04;
+            for b=1:N_baselines
+                h=annotation(gcf, 'textbox',[0.4,0.14-x_pos,0.0001,0.001],'String',text_in_textbox{b},...
+                    'FitBoxToText','on','FontSize',cnf_tool.textbox_fontsize, 'Interpreter',text_interpreter, 'EdgeColor','none');
+                x_pos = x_pos+0.03;
+            end
+
+
+            % Sigma0
+            ax=subplot(5,3,[9,12]);
+            ax.Position(2) = ax.Position(2)*0.8;
+            text_in_textbox=cell(N_baselines,1);
+            plot_baseline = 1;
+            for b=1:N_baselines
+                coef_width=1*0.6^(plot_baseline-1);
+                plot_baseline = plot_baseline + 1;
+                mask = find(lat_surf{b}>=min(lat_ini,lat_end) & lat_surf{b}<=max(lat_ini,lat_end));
+                plt=plot(lat_surf{b}(mask),sigma0_filtered{b}(mask),'Marker',cnf_tool.marker_bs{b},'Color',color_bs(b,:),...
+                        'LineStyle',cnf_tool.LineStyle{b}, 'MarkerSize', cnf_tool.default_markersize, 'LineWidth', coef_width*cnf_tool.default_linewidth);
+                plt.Color(4) = 1; % transparency
+                hold on;
+                spacing_x = strcat('%', string(28-length(char(name_bs(b)))-5-7^(b-2)), 's');
+                text_in_textbox{b}=[text_in_textbox{b}, strcat(char(name_bs(b)), ' [dB]'), sprintf(char(spacing_x), ''), sprintf('%.4f%8s %.4f\n', ...
+                    sigma0_std_mean(b), '', nanmean(sigma0_mean{b}))];
+%                 if b ~= N_baselines
+%                    text_in_textbox = [text_in_textbox, sprintf('\n')]; 
+%                 end
+            end
+            set(gca,'Xdir','reverse')
+            plot_baseline = 1;
+            xlabel('Latitude [deg.]','Interpreter',text_interpreter); ylabel(strcat('\sigma^0',' [dB]'),'Interpreter',text_interpreter);
+            xlim([min(data{baseline_HR}.GEO.LAT), max(data{baseline_HR}.GEO.LAT)]);
+            ylim([0.9*min([sigma0_filtered{:}]), 1.1*max([sigma0_filtered{:}])]);
+
+            text_in_textbox=text_in_textbox(~cellfun(@isempty,text_in_textbox));
+            annotation(gcf, 'textbox',[0.68,0.14,0,0],'String',sprintf('%32s <\\sigma_{\\sigma^0,detr}> %5s <\\sigma^0>\n', '', ''),...
+                    'FitBoxToText','on','FontSize',cnf_tool.textbox_fontsize, 'Interpreter',text_interpreter, 'EdgeColor','none');
+            x_pos=0.04;
+            for b=1:N_baselines
+                h=annotation(gcf, 'textbox',[0.68,0.14-x_pos,0.0001,0.001],'String',text_in_textbox{b},...
+                    'FitBoxToText','on','FontSize',cnf_tool.textbox_fontsize, 'Interpreter',text_interpreter, 'EdgeColor','none');
+                x_pos = x_pos+0.03;
+            end
+         
+%             annotation(gcf, 'textbox',[0.71,0.58,0,0],'String',sprintf('(*) No geophysical corrections applied to retrieved parameters.'),...
+%                     'FitBoxToText','on','FontSize',9, 'Interpreter',text_interpreter, 'EdgeColor','none');
+
+            addlogoisardSAT('plot', 'position', 'top');
             
             % define output filename
             indx_bs = 1:length(name_bs);
