@@ -112,7 +112,8 @@ end
 time_20_ku_name = 'time_20_ku';
 id_aux      = netcdf.defVar(ncid,time_20_ku_name,double_type,ku_rec_dimension);
             netcdf.putAtt(ncid,id_aux,std_name_att,'time');
-            netcdf.putAtt(ncid,id_aux,long_name_att,'UTC Seconds since 2000-01-01 00:00:00.0+00:00 (Ku-band)');
+%             netcdf.putAtt(ncid,id_aux,long_name_att,'UTC Seconds since 2000-01-01 00:00:00.0+00:00 (Ku-band)');
+            netcdf.putAtt(ncid,id_aux,long_name_att,'Time in TAI: it contains the seconds since 2000-01-01 00:00:00.0+00:00 (Ku-band)'); % Alba
             netcdf.putAtt(ncid,id_aux,calendar_name_att,'Gregorian');
             netcdf.putAtt(ncid,id_aux,units_att,seconds_units);
 			netcdf.putAtt(ncid,id_aux,comment_att,'time at surface of the SAR measurement(multilooked waveform).');
