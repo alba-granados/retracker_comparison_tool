@@ -269,6 +269,7 @@ for i_fileL1B_input=1:filesBulk.nFilesL1B
     out.cor         =   zeros(1,length(data.GEO.LAT));
     out.SSH         =   zeros(1,length(data.GEO.LAT));
     out.sigma0      =   zeros(1,length(data.GEO.LAT));
+    out.COR          =   zeros(1,length(data.GEO.LAT));
     wfm_lrm_norm    =   zeros(nf_p.Ns,length(data.GEO.LAT));
 
     for m = 1:N_records
