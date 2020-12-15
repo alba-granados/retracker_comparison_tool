@@ -79,7 +79,7 @@ input_L1_ISR_Files=dir(fullfile(char(filesBulk(i_baseline).input_path_L1_ISR_bs)
 if ~isempty(input_L1_ISR_Files)
     empty_flag(i_baseline)=0; % L1 file exists in baseline 1, 
 else
-    fprintf(char(strcat({'\n File not available in L2 ISR data set '},char(name_bs(i_baseline)),': ',data_string,'\n')));
+    fprintf(char(strcat({'\n L2 file not available in L1 ISR data set '},char(name_bs(i_baseline)),': ',data_string,'\n')));
 end
 
 i_fileL1_input=find(~cellfun(@isempty,strfind({filesBulk(i_baseline).L1BFiles(:).name},input_L1_ISR_Files.name)), 1);
@@ -87,7 +87,7 @@ filename_L1{i_baseline}=char(filesBulk(i_baseline).L1BFiles(i_fileL1_input).name
 [~,aux,fileext_L1]=fileparts(filename_L1{i_baseline});
 filename_L1{i_baseline}=strcat(char(filesBulk(i_baseline).input_path_L1_ISR_bs),filename_L1{i_baseline});
 
-for i_baseline=2:N_baselines
+for i_baseline=2:N_baselines % find equivalent product for all baseline based on sensing time string
 
     input_L2_ISR_Files   = dir(fullfile(char(filesBulk(i_baseline).input_path_L2_ISR_bs),['*' data_string  strcat('*', fileext_L2)]));
     if ~isempty(input_L2_ISR_Files)
