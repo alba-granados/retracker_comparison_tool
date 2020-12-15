@@ -67,7 +67,7 @@ end
 
 % Default path to configuration file
 cnf_waveformfittingtool_path  = strcat(pwd, filesep);    
-tool_bsln_id = 'S6_LX2_CL_HR_dl20.json';
+tool_bsln_id = 'S6_LX2_CL_RMCboardRMCground.json';
 inputFiles      =   dir(cnf_waveformfittingtool_path);
 aux=struct2cell(inputFiles); aux=aux(1,:); %Keep the
 if ~isempty(tool_bsln_id)
@@ -275,13 +275,14 @@ for i_baseline=1:num_baselines
     end
     filesBulk(i_baseline).CST_file=[filesBulk(i_baseline).cnf_chd_cst_path inputFiles(~cellfun(@isempty,strfind(aux,char(['cst_file','.json'])))).name];
 
-    reduced_set_cnf.SCOOP=0;
-    reduced_set_cnf.SHAPE=0;
+    reduced_set_cnf.SCOOP=0; reduced_set_cnf.SHAPE=0;
+    
+    % same retracker cnf_p for all baselines
     cnf_p=read_CNF_json(filesBulk(i_baseline).CNF_file,reduced_set_cnf);
-    cnf_p.SCOOP_flag =0;
-    cnf_p.SHAPE_flag =0;
+    cnf_p.SCOOP_flag =0; cnf_p.SHAPE_flag =0;
 
     filesBulk(i_baseline).CHD_file=[filesBulk(i_baseline).cnf_chd_cst_path inputFiles(~cellfun(@isempty,strfind(aux,char(['chd_file','_',cnf_p.mission,'.json'])))).name];
+    % same retracker cst_p, chd_p for all baselines
     cst_p=read_CST_json(filesBulk(i_baseline).CST_file); %CST --> provide the global constant variables
     chd_p=read_CHD_json(filesBulk(i_baseline).CHD_file,cnf_p,cst_p);
 
@@ -299,7 +300,7 @@ for i_baseline=1:num_baselines
     aux=struct2cell(inputFiles); aux=aux(1,:); 
     aux_filter=aux(~strcmp(aux,['.'])&~strcmp(aux,['..']));
     accepted_filters = {'.NC', '.nc'};
-    for ii=1:numel(aux_filter)
+    for ii=1:numel(aux_filter) % find extension
         [~,~,filter]=fileparts(aux_filter{ii});
         if any(find(ismember(accepted_filters,filter)))
             break;
@@ -313,6 +314,7 @@ for i_baseline=1:num_baselines
 
     filesBulk(i_baseline).nFilesL1B=length(indexFilesL1);
     filesBulk(i_baseline).L1BFiles=inputFiles(indexFilesL1);
+
     
     % ------------------ Input L2 files filtering ---------------------------
     filesBulk(i_baseline).input_path_L2_ISR_bs        =   char(input_path_L2_ISR_bs{i_baseline});
@@ -338,6 +340,9 @@ for i_baseline=1:num_baselines
     
     fprintf('Total number of L2 files (%s) to be processed: %.0f\n', char(name_bs(i_baseline)), filesBulk(i_baseline).nFilesL2);
     
+    % % split netcdf in case track contains more than one pass (duplicated latitudes)
+    filesBulk(i_baseline) = split_bsl_tracks_into_pass(filesBulk(i_baseline));
+   
 end
 
 
