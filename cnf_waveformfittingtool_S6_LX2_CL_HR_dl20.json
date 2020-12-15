@@ -162,7 +162,7 @@
     	"input_path_L1_ISR_bs": {
         "description": "String array containing path to the input L1B product files according to the name_bs order",
         "units": "flag",
-        "value": ["/home/agranados/data/S6_GPP/S6_commissioning/inputs/L1GPP_803/P4_1B/RAW_guided", "/home/agranados/data/S6_GPP/S6_commissioning/inputs/L1GPP_803/P4_1B/RMC_onboard_guided/", "/home/agranados/data/S6_GPP/S6_commissioning/inputs/L1GPP_803/P4_1B/RMC_ground_guided/"]
+        "value": ["/home/agranados/data/S6_GPP/S6_commissioning/inputs/L1GPP_803/P4_1B/RAW_guided/NEW/", "/home/agranados/data/S6_GPP/S6_commissioning/inputs/L1GPP_803/P4_1B/RMC_onboard_guided/NEW/", "/home/agranados/data/S6_GPP/S6_commissioning/inputs/L1GPP_803/P4_1B/RMC_ground_guided/NEW/"]
     },
     	"input_path_L2_ISR_bs": {
         "description": "String array containing path to the input L2 product files according to the name_bs order. Strings shall be empty if the tool runs the L2 processor for the corresponding baseline. In that case, the string or path will correspond to output_path_L2_ISR_bs",

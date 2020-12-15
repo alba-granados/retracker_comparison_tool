@@ -41,11 +41,11 @@
     },
 	"color_bs": {
         "description": "Color palette to be used in output figures - colorblind",
-        "value": [86/255, 180/255, 233/255; 230/255, 159/255, 0/255; 0/255, 158/255, 115/255; 213/255, 94/255, 0/255; 0/255, 114/255, 178/255; 204/255, 121/255, 167/255; 240/255, 228/255, 66/255; 0/255, 0/255, 0/255]
+        "value": [ 97/255, 181/255, 226/255; 209/255, 96/255, 47/255; 15/255, 90/255, 137/255; 25/255, 158/255, 116/255; 204/255, 121/255, 167/255; 240/255, 228/255, 66/255; 0/255, 0/255, 0/255]
     },
 	"plot_downsampling": {
         "description": "Downsampling of the surfaces to be ploted: every each number of surfaces the plot is generated and saved",
-        "value": 200
+        "value": 500
     },
 	"text_interpreter": {
         "description": "Flag to indicate the text font interpreter in output figures (tex, latex)",
@@ -53,15 +53,15 @@
     },
 	"default_fontsize": {
         "description": "Flag to indicate the fontsize of output figure to be generated",
-        "value": 18
+        "value": 22
     },
 	"textbox_fontsize": {
         "description": "Flag to indicate the fontsize of text in boxes of output figures",
-        "value": 17
+        "value": 19
     },
 	"legend_fontsize": {
         "description": "Flag to indicate the fontsize of legends in boxes of output figures",
-        "value": 18
+        "value": 20
     },
 	"default_fontname": {
         "description": "Flag to indicate the fontname of text in output figures",
@@ -73,7 +73,11 @@
     },
 	"default_linewidth": {
         "description": "Flag to indicate the linewidth of lines in output figures",
-        "value": 1
+        "value": 3
+    },
+	"default_linewidth_wfm": {
+        "description": "Flag to indicate the linewidth of lines in fitted waveforms output figures",
+        "value": 4
     },
 	"overlay_baselines": {
         "description": "Flag to indicate whether waveforms of different baselines shall be added in the same output figure",
@@ -93,7 +97,7 @@
     },
 	"LineStyle": {
         "description": "Flag to indicate the line style connecting marks in the output figures of geophysical estimates",
-        "value": "none"
+        "value": ['none','none','none','none','-','-','-']
     },
 	"marker_bs": {
         "description": "Flag to indicate the marker style in the output figures of geophysical estimates",
