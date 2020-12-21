@@ -67,7 +67,7 @@ end
 
 % Default path to configuration file
 cnf_waveformfittingtool_path  = strcat(pwd, filesep);    
-tool_bsln_id = 'S6_LX2_CL_RMCboardRMCground.json';
+tool_bsln_id = 'S6_LX2_CL_HR_RMC_dl20.json';
 inputFiles      =   dir(cnf_waveformfittingtool_path);
 aux=struct2cell(inputFiles); aux=aux(1,:); %Keep the
 if ~isempty(tool_bsln_id)
@@ -337,9 +337,7 @@ for i_baseline=1:num_baselines
     filesBulk(i_baseline).L2Files=inputFiles(indexFilesL2);
     
     clear inputFiles indexFilesL2 filter2DATAFILES;    
-    
-    fprintf('Total number of L2 files (%s) to be processed: %.0f\n', char(name_bs(i_baseline)), filesBulk(i_baseline).nFilesL2);
-    
+        
     % % split netcdf in case track contains more than one pass (duplicated latitudes)
     filesBulk(i_baseline) = split_bsl_tracks_into_pass(filesBulk(i_baseline));
    
