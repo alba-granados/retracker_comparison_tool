@@ -51,6 +51,8 @@ new_file_name(21:21+30) = [start_sens_new '_' stop_sens_new]; % new sensing time
 
 file_p2 = [file_origin_path, new_file_name];
 
-system(sprintf('ncks -d %s,%d,%d %s %s\n', name_time_dimension(end), interval_to_select(1), interval_to_select(2), file_p, file_p2));
+if ~exist(file_p2, 'file') % if pass had not been created in previous runs of the tool
+    system(sprintf('ncks -d %s,%d,%d %s %s\n', name_time_dimension(end), interval_to_select(1), interval_to_select(2), file_p, file_p2));
+end
 
 end
