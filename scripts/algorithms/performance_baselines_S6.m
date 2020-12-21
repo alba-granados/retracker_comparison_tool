@@ -153,6 +153,9 @@ for i_baseline=1:N_baselines
     lon_surf{i_baseline} = lon_surf{i_baseline}(lat_mask{i_baseline});
     SSH{i_baseline}=SSH{i_baseline}(lat_mask{i_baseline});
     SWH{i_baseline}=SWH{i_baseline}(lat_mask{i_baseline});
+    
+%     SWH{i_baseline}(SWH{i_baseline}>=4)=NaN;    
+    
     sigma0{i_baseline}=sigma0{i_baseline}(lat_mask{i_baseline});
     if strcmp(cnf_tool.L2proc{i_baseline}, 'ISD')
         COR{i_baseline}=COR{i_baseline}(lat_mask{i_baseline});
@@ -300,6 +303,13 @@ text_title = {aux{1}, 'L1', aux{2}};
 text_interpreter=get(0, 'defaultAxesTickLabelInterpreter'); %cnf_p.text_interpreter;
 plot_baseline = 1;
 
+% write statistics in .txt file
+fid_stat_param=fopen([path_comparison_results,file_id,'_stat_param.txt'],'w');
+fprintf(fid_stat_param,'------------------------------------------------------------------------------------\n');
+fprintf(fid_stat_param,'----------- Computed statistics of retrieved geophysical parameters ----------------\n');
+fprintf(fid_stat_param,'------------------------------------------------------------------------------------\n');
+fprintf(fid_stat_param,'%35s%s%7s%s%7s%s\n','', 'RMSE', '', '<std>', '', '<mean>');
+
 if generate_plot_SSH 
     
     %--------------------- SSH --------------------------------------------
@@ -326,6 +336,8 @@ if generate_plot_SSH
         if b ~= N_baselines
            text_in_textbox = [text_in_textbox, sprintf('\n')]; 
         end
+        
+        fprintf(fid_stat_param,'%s [%s] %15s %.5f %3s %.5f %3s %.5f\n','SSH', char(name_bs(b)), '', SSH_RMSE(b), '', SSH_std_mean(b), '', nanmean(SSH_mean{b}));
     end
     plot_baseline = 1;
     title(strjoin(text_title), 'Interpreter',text_interpreter);
@@ -354,7 +366,7 @@ if generate_plot_SSH
     if cnf_tool.save_figure_format_fig
        savefig([path_comparison_results,file_id,'_SSH', '.fig']) 
     end
-    
+        
     %--------------------- SSH difference ----------------------------------------
 
     if N_baselines > 1
@@ -381,6 +393,9 @@ if generate_plot_SSH
             if b ~= size(index_baseline_compare,1) 
                text_in_textbox = [text_in_textbox, sprintf('\n')]; 
             end
+            
+            fprintf(fid_stat_param,'%s [%s-%s] %5s %s %2s %.5f %2s %.5f\n','SSH', char(name_bs(b1)), char(name_bs(b2)), '', 'NaN', '', nanstd(SSH_mean{b1}-SSH_mean{b2}), '', nanmean(SSH_mean{b1}-SSH_mean{b2}));
+
         end
         plot_baseline = 1;
         title(strjoin(text_title), 'Interpreter',text_interpreter);
@@ -448,6 +463,9 @@ if generate_plot_SWH
         if b ~= N_baselines
            text_in_textbox = [text_in_textbox, sprintf('\n')]; 
         end
+        
+        fprintf(fid_stat_param,'%s [%s] %15s %.5f %3s %.5f %3s %.5f\n','SWH', char(name_bs(b)), '', SWH_RMSE(b), '', SWH_std_mean(b), '', nanmean(SWH_mean{b}));
+
     end
     plot_baseline = 1;
     title(strjoin(text_title), 'Interpreter',text_interpreter);
@@ -500,6 +518,10 @@ if generate_plot_SWH
             if b ~= size(index_baseline_compare,1) 
                text_in_textbox = [text_in_textbox, sprintf('\n')]; 
             end
+            
+            fprintf(fid_stat_param,'%s [%s-%s] %5s %s %2s %.5f %2s %.5f\n','SWH', char(name_bs(b1)), char(name_bs(b2)), '', 'NaN', '', ...
+                nanstd(SWH_mean{b1}-SWH_mean{b2}), '', nanmean(SWH_mean{b1}-SWH_mean{b2}));
+
         end
         plot_baseline = 1;
         title(strjoin(text_title), 'Interpreter',text_interpreter);
@@ -555,6 +577,9 @@ if generate_plot_sigma0
            text_in_textbox = [text_in_textbox, sprintf('\n')]; 
         end
 
+        fprintf(fid_stat_param,'%s [%s] %15s %.5f %3s %.5f %3s %.5f\n','sigma0', char(name_bs(b)), '', sigma0_RMSE(b), '', sigma0_std_mean(b), '', ...
+                                                                                                    nanmean(sigma0_mean{b}));
+
     end
     plot_baseline = 1;
     title(strjoin(text_title), 'Interpreter',text_interpreter);
@@ -608,10 +633,13 @@ if generate_plot_sigma0
             hold on;
             legend_text=[legend_text,sprintf('%s vs %s', char(name_bs(b1)), char(name_bs(b2)))];
             text_in_textbox=[text_in_textbox, sprintf('%s vs %s:', char(name_bs(b1)), char(name_bs(b2))), sprintf('Mean = %.4g [dB]\nstd = %.4g [dB]', ...
-                nanmean(SWH_mean{b1}-SWH_mean{b2}), nanstd(SWH_mean{b1}-SWH_mean{b2}))];
+                nanmean(sigma0_mean{b1}-sigma0_mean{b2}), nanstd(sigma0_mean{b1}-sigma0_mean{b2}))];
             if b ~= size(index_baseline_compare,1) 
                text_in_textbox = [text_in_textbox, sprintf('\n')]; 
             end
+            
+            fprintf(fid_stat_param,'%s [%s-%s] %5s %s %2s %.5f %2s %.5f\n','sigma0', char(name_bs(b1)), char(name_bs(b2)), '', 'NaN', '', ...
+                nanstd(sigma0_mean{b1}-sigma0_mean{b2}), '', nanmean(sigma0_mean{b1}-sigma0_mean{b2}));
         end
         plot_baseline = 1;
         title(strjoin(text_title), 'Interpreter',text_interpreter);
@@ -675,6 +703,9 @@ if generate_plot_COR && ~any(ismember(cnf_tool.L2proc,'GPP'))
         if b ~= N_baselines
            text_in_textbox = [text_in_textbox, sprintf('\n')]; 
         end
+        
+        fprintf(fid_stat_param,'%s [%s] %15s %.5f %3s %.5f %3s %.5f\n','COR', char(name_bs(b)), '', COR_RMSE(b), '', COR_std_mean(b), '', ...
+                                                                                                    nanmean(COR_mean{b}));
     end
     plot_baseline = 1;
     title(strjoin(text_title), 'Interpreter',text_interpreter);
@@ -726,6 +757,9 @@ if generate_plot_COR && ~any(ismember(cnf_tool.L2proc,'GPP'))
             if b ~= size(index_baseline_compare,1) 
                text_in_textbox = [text_in_textbox, sprintf('\n')]; 
             end
+            
+            fprintf(fid_stat_param,'%s [%s-%s] %5s %s %2s %.5f %2s %.5f\n','COR', char(name_bs(b1)), char(name_bs(b2)), '', 'NaN', '', ...
+                nanstd(COR_mean{b1}-COR_mean{b2}), '', nanmean(COR_mean{b1}-COR_mean{b2}));
         end
         plot_baseline = 1;
         title(strjoin(text_title), 'Interpreter',text_interpreter);
@@ -757,6 +791,8 @@ if generate_plot_COR && ~any(ismember(cnf_tool.L2proc,'GPP'))
     end
     close(f1);
 end
+
+fclose(fid_stat_param);
 
 % save(strcat(path_comparison_results,file_id,'_Perf_',strjoin(strrep(strrep(name_bs,' ','_'),'-','_'),'_vs_')));
 
