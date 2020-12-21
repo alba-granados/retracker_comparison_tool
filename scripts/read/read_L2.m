@@ -114,6 +114,9 @@ for i_baseline=2:N_baselines % find equivalent product for all baseline based on
 
 end
 
+% fprintf('Total number of L2 files (%s) to be processed: %.0f\n', char(name_bs(i_baseline)), filesBulk(i_baseline).nFilesL2);
+
+
 flag = 1;
 % skip function if file does not exist in any baseline
 if any(empty_flag)
