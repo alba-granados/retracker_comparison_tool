@@ -153,8 +153,8 @@ for i_baseline=1:N_baselines
     lon_surf{i_baseline} = lon_surf{i_baseline}(lat_mask{i_baseline});
     SSH{i_baseline}=SSH{i_baseline}(lat_mask{i_baseline});
     SWH{i_baseline}=SWH{i_baseline}(lat_mask{i_baseline});
-    
-%     SWH{i_baseline}(SWH{i_baseline}>=4)=NaN;    
+
+%     SWH{i_baseline}(SWH{i_baseline}<4)=NaN;   
     
     sigma0{i_baseline}=sigma0{i_baseline}(lat_mask{i_baseline});
     if strcmp(cnf_tool.L2proc{i_baseline}, 'ISD')
@@ -177,7 +177,7 @@ for i_baseline=1:N_baselines
         idx_nooutliers_sigma0=find(~idx_outliers_sigma0{i_baseline});
         %----------------- SWH ------------------------------------
         [SWH{i_baseline},idx_outliers_SWH{i_baseline}]=remove_outliers(SWH{i_baseline},'type_outliers_removal', type_outliers_removal, 'IQR_times', IQR_times);
-        idx_nooutliers_SWH=find(~idx_outliers_SWH{i_baseline});
+        idx_nooutliers_SWH{i_baseline}=find(~idx_outliers_SWH{i_baseline});
         if strcmp(cnf_tool.L2proc{i_baseline}, 'ISD')
             %----------------- COR ------------------------------------
             [COR{i_baseline},idx_outliers_COR{i_baseline}]=remove_outliers(COR{i_baseline},'type_outliers_removal', type_outliers_removal, 'IQR_times', IQR_times);
@@ -193,7 +193,7 @@ for i_baseline=1:N_baselines
         idx_nooutliers_sigma0=find(~idx_outliers_sigma0{i_baseline});
         %----------------- SWH ------------------------------------
         idx_outliers_SWH{i_baseline}=zeros(1,ISD_num_surfaces);
-        idx_nooutliers_SWH=find(~idx_outliers_SWH{i_baseline});
+        idx_nooutliers_SWH{i_baseline}=find(~idx_outliers_SWH{i_baseline});
         if strcmp(cnf_tool.L2proc{i_baseline}, 'ISD')
             %----------------- COR ------------------------------------
             idx_outliers_COR{i_baseline}=zeros(1,ISD_num_surfaces);
@@ -201,6 +201,7 @@ for i_baseline=1:N_baselines
         end        
         
     end
+     
     
     %% --------------- Smoothing geophysical retrievals ---------------
     if smooth_param
@@ -226,11 +227,11 @@ for i_baseline=1:N_baselines
         last_sample=min([(i_box-1)*win_size_detrending+win_size_detrending,ISD_num_surfaces]);
         
         SSH_std{i_baseline}(i_box)=nanstd(detrend(SSH{i_baseline}(idx_nooutliers_SSH(idx_nooutliers_SSH>=init_sample & idx_nooutliers_SSH<=last_sample))));
-        SWH_std{i_baseline}(i_box)=nanstd(detrend(SWH{i_baseline}(idx_nooutliers_SWH(idx_nooutliers_SWH>=init_sample & idx_nooutliers_SWH<=last_sample))));
+        SWH_std{i_baseline}(i_box)=nanstd(detrend(SWH{i_baseline}(idx_nooutliers_SWH{i_baseline}(idx_nooutliers_SWH{i_baseline}>=init_sample & idx_nooutliers_SWH{i_baseline}<=last_sample))));
         sigma0_std{i_baseline}(i_box)=nanstd(detrend(sigma0{i_baseline}(idx_nooutliers_sigma0(idx_nooutliers_sigma0>=init_sample & idx_nooutliers_sigma0<=last_sample))));
         
         SSH_mean{i_baseline}(i_box)=nanmean((SSH{i_baseline}(idx_nooutliers_SSH(idx_nooutliers_SSH>=init_sample & idx_nooutliers_SSH<=last_sample))));
-        SWH_mean{i_baseline}(i_box)=nanmean((SWH{i_baseline}(idx_nooutliers_SWH(idx_nooutliers_SWH>=init_sample & idx_nooutliers_SWH<=last_sample))));
+        SWH_mean{i_baseline}(i_box)=nanmean((SWH{i_baseline}(idx_nooutliers_SWH{i_baseline}(idx_nooutliers_SWH{i_baseline}>=init_sample & idx_nooutliers_SWH{i_baseline}<=last_sample))));
         sigma0_mean{i_baseline}(i_box)=nanmean((sigma0{i_baseline}(idx_nooutliers_sigma0(idx_nooutliers_sigma0>=init_sample & idx_nooutliers_sigma0<=last_sample))));
 
         if strcmp(cnf_tool.L2proc{i_baseline}, 'ISD')
@@ -262,7 +263,7 @@ for i_baseline=1:N_baselines
         COR_std_mean(i_baseline)=nanmean(COR_std{i_baseline});
     end
     
-    clear idx_nooutliers_SSH idx_nooutliers_SWH idx_nooutliers_sigma0 idx_nooutliers_COR; %idx_nooutliers_Misfit;
+    clear idx_nooutliers_SSH idx_nooutliers_sigma0 idx_nooutliers_COR; %idx_nooutliers_Misfit;
     clear idx_nooutliers_SSH_ESA idx_nooutliers_sigma0_ESA;
     clear idx_nooutliers_SSH_ISR_ESA idx_nooutliers_sigma0_ISR_ESA;
     clear idx_nooutliers_SSH_STL idx_nooutliers_sigma0_STL idx_nooutliers_SWH_STL;
@@ -505,7 +506,6 @@ if generate_plot_SWH
             b1=index_baseline_compare(b,1);
             b2=index_baseline_compare(b,2);
 
-            bias_compensation=0.0;%nanmean(SSH(b,:))-12.0;
             coef_width=1*0.6^(plot_baseline-1);
             plot_baseline = plot_baseline + 1;
             plt=plot(lat_surf{b1},SWH{b1}-SWH{b2},'Marker',char(marker_bs(b)),'Color',color_bs(b,:),'LineStyle',cnf_tool.LineStyle{b1}, ...
@@ -518,7 +518,7 @@ if generate_plot_SWH
             if b ~= size(index_baseline_compare,1) 
                text_in_textbox = [text_in_textbox, sprintf('\n')]; 
             end
-            
+                        
             fprintf(fid_stat_param,'%s [%s-%s] %5s %s %2s %.5f %2s %.5f\n','SWH', char(name_bs(b1)), char(name_bs(b2)), '', 'NaN', '', ...
                 nanstd(SWH_mean{b1}-SWH_mean{b2}), '', nanmean(SWH_mean{b1}-SWH_mean{b2}));
 
@@ -550,8 +550,100 @@ if generate_plot_SWH
            savefig([path_comparison_results,file_id,'_differenceSWH', '.fig']) 
         end
         close(f2);
+        
+        % -------------- SWH difference vs SWH --------------------
+        f2=figure;
+        legend_text={''};
+        for b=1:size(index_baseline_compare,1) 
+            b1=index_baseline_compare(b,1);
+            b2=index_baseline_compare(b,2);
+
+            coef_width=1*0.6^(plot_baseline-1);
+            plot_baseline = plot_baseline + 1;
+            plt=plot(SWH{b1},abs(SWH{b1}-SWH{b2}),'Marker',char(marker_bs(b)),'Color',color_bs(b,:),'LineStyle','none', ...
+                'MarkerSize', cnf_tool.default_markersize);
+            plt.Color(4) = 1; % transparency
+            hold on;
+            legend_text=[legend_text,sprintf('%s vs %s', char(name_bs(b1)), char(name_bs(b2)))];
+        end
+        plot_baseline = 1;
+        title(strjoin(text_title), 'Interpreter',text_interpreter);
+        leg=legend(legend_text(~cellfun(@isempty,legend_text)),'Location','northeastoutside','Fontsize',cnf_tool.legend_fontsize);
+        pos_leg=get(leg,'Position');
+        xlim([0 11]); ylim([0,nanmean(abs(SWH{b1}-SWH{b2}))+2*nanstd(abs(SWH{b1}-SWH{b2}))]);
+        xlabel('SWH [m]','Interpreter',text_interpreter); ylabel('|SWH difference| [m]','Interpreter',text_interpreter);
+        addlogoisardSAT('plot');
+
+        print(print_file,cnf_tool.res_fig,[path_comparison_results,file_id,'_differenceSWH_vs_SWH', file_ext]); % figure_format
+        close(f2);
+        
+        % -------------- SWH difference histogram for each baseline  --------------------
+        SWH_original = SWH;  
+        f2=figure;
+        legend_text={''};
+        text_in_textbox={''};   
+        gleq = '<';
+        for ii=1:2  % set SWH>4 and SWH<4 to NaN and recompute mean and std
+            clear SWH_mean SWH
+            for b=1:N_baselines        
+                SWH{b}= SWH_original{b};
+                
+%                 [SWH{b},idx_outliers_SWH{b}]=remove_outliers(SWH{b},'type_outliers_removal', type_outliers_removal, 'IQR_times', IQR_times);
+%                 idx_nooutliers_SWH{b}=find(~idx_outliers_SWH{b});
+                
+                if ii==1 
+                    SWH{b}(SWH{b}>=4)=NaN; % Hs < 4
+                else 
+                    SWH{b}(SWH{b}<4)=NaN; % Hs>=4
+                    gleq = '>=';
+                end
+                
+                num_boxes=floor(ISD_num_surfaces/win_size_detrending);
+                for i_box=1:(num_boxes+1)
+                    init_sample=max([(i_box-1)*win_size_detrending+1,1]);
+                    last_sample=min([(i_box-1)*win_size_detrending+win_size_detrending,ISD_num_surfaces]);
+                    SWH_mean{b}(i_box)=nanmean((SWH{b}(idx_nooutliers_SWH{b}(idx_nooutliers_SWH{b}>=init_sample & idx_nooutliers_SWH{b}<=last_sample))));
+                end      
+            end
+            
+            % plot
+            for b=1:size(index_baseline_compare,1)
+                b1=index_baseline_compare(b,1);
+                b2=index_baseline_compare(b,2);
+
+                plt=histogram(SWH{b1}-SWH{b2},'BinWidth', 0.01, 'Normalization','probability', 'FaceColor', color_bs(ii,:), 'EdgeColor', 'none');
+%                 plt.Color(4) = 1; % transparency
+                hold on;
+                legend_text=[legend_text,sprintf('%s vs %s, H_s %s 4', char(name_bs(b1)), char(name_bs(b2)), gleq)];
+                text_in_textbox=[text_in_textbox, sprintf('%s vs %s:', char(name_bs(b1)), char(name_bs(b2))), sprintf('mean = %.4g [m]\nstd = %.4g [m]', ...
+                    nanmean(SWH_mean{b1}-SWH_mean{b2}), nanstd(SWH_mean{b1}-SWH_mean{b2}))]; 
+                if b ~= size(index_baseline_compare,1) 
+                   text_in_textbox = [text_in_textbox, sprintf('\n\n')]; 
+                end
+
+            end
+        end
+        plot_baseline = 1;
+        title(strjoin(text_title), 'Interpreter',text_interpreter);
+        leg=legend(legend_text(~cellfun(@isempty,legend_text)),'Location','northeast','Fontsize',cnf_tool.legend_fontsize);
+        pos_leg=get(leg,'Position');
+        text_in_textbox=text_in_textbox(~cellfun(@isempty,text_in_textbox));
+        if annotation_box_active
+            h=annotation('textbox',[pos_leg(1),pos_leg(2)-3*pos_leg(4),pos_leg(3),pos_leg(4)],'String',text_in_textbox,...
+                'FitBoxToText','on','FontSize',cnf_tool.textbox_fontsize, 'Interpreter',text_interpreter);
+            h.LineWidth = 0.5;
+        end
+        xlim([-1 1]);
+%         xlim([-(nanmean(abs(SWH{b1}-SWH{b2}))+2*nanstd(abs(SWH{b1}-SWH{b2}))),nanmean(abs(SWH{b1}-SWH{b2}))+2*nanstd(abs(SWH{b1}-SWH{b2}))]);
+        xlabel('SWH difference [m]','Interpreter',text_interpreter); ylabel('frequency','Interpreter',text_interpreter);
+        addlogoisardSAT('plot');
+
+        print(print_file,cnf_tool.res_fig,[path_comparison_results,file_id,'_differenceSWH_histogram', file_ext]); % figure_format
+        close(f2);
+        
     end
     close(f1);
+    
 end
 
 if generate_plot_sigma0
