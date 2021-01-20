@@ -227,7 +227,7 @@ for m = 1:L2_num_surfaces
                 coef_width = 1;
             else            
                 % plot measured waveform
-                coef_width=1.1*0.6^(plot_baseline-1);
+                coef_width=1.1*0.5^(plot_baseline-1);
             end
 
             plt_meas(i_baseline) = plot(1:data{i_baseline}.N_samples,data{i_baseline}.HRM.power_wav_filtered(m,:)/max(data{i_baseline}.HRM.power_wav_filtered(m,:)),...
